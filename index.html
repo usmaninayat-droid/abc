@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bin Collection Ongoing</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    #app { display: flex; height: 100vh; width: 100vw; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 360px;
+      flex-shrink: 0;
+      background: #f5f6f8;
+      border-right: 1px solid #e3e5ea;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 12px;
+      overflow-y: auto;
+    }
+    .progress-bar { display: flex; gap: 4px; margin-top: 4px; }
+    .progress-bar .seg { height: 4px; flex: 1; border-radius: 2px; background: #e3e5ea; }
+    .progress-bar .seg.green { background: #2eb872; }
+    .progress-bar .seg.amber { background: #f5a623; }
+    .progress-bar .seg.red { background: #e54d4d; }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: baseline; }
+    .card-header .title { font-weight: 600; color: #222; }
+    .card-header .meta { color: #6b7280; font-size: 13px; }
+    .stats { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+    .stat-row { display: flex; align-items: center; gap: 10px; }
+    .pin { width: 14px; height: 18px; position: relative; flex-shrink: 0; }
+    .pin::before {
+      content: ""; position: absolute; top: 0; left: 1px;
+      width: 12px; height: 12px; border-radius: 50%;
+    }
+    .pin::after {
+      content: ""; position: absolute; bottom: 0; left: 6px;
+      width: 2px; height: 6px; background: #6b1f1f;
+    }
+    .pin.green::before { background: #2eb872; }
+    .pin.amber::before { background: #f5a623; }
+    .pin.red::before   { background: #c0392b; }
+    .stat-text .num { font-weight: 600; }
+    .stat-text .label { color: #6b7280; font-size: 13px; }
+
+    .row-card { display: flex; align-items: center; gap: 12px; }
+    .row-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: #f0f1f4; display: flex; align-items: center; justify-content: center;
+      color: #4a5568; font-size: 18px;
+    }
+    .row-card .label { color: #6b7280; font-size: 13px; }
+    .row-card .value { font-weight: 600; color: #222; }
+
+    .end-btn {
+      margin-top: auto;
+      background: #c8eedd;
+      color: #1a8f5b;
+      border: 1px solid #2eb872;
+      border-radius: 10px;
+      padding: 14px;
+      font-weight: 600;
+      font-size: 15px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      cursor: pointer;
+    }
+    .end-btn .arrow {
+      width: 24px; height: 24px; border-radius: 50%; background: #2eb872;
+      color: #fff; display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    /* Map */
+    .map-wrap { flex: 1; position: relative; }
+    #map { position: absolute; inset: 0; }
+
+    /* Floating route toggle */
+    .route-toggle {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 1000;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 180px;
+      font-size: 13px;
+    }
+    .route-toggle .header { font-weight: 600; color: #222; margin-bottom: 2px; }
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .toggle-row .left { display: flex; align-items: center; gap: 8px; }
+    .swatch { width: 16px; height: 4px; border-radius: 2px; }
+    .swatch.planned { background: #6b5cff; }
+    .swatch.actual  { background: #2eb872; }
+
+    /* iOS-style switch */
+    .switch { position: relative; width: 36px; height: 20px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: #cbd0d8; border-radius: 999px; transition: 0.2s;
+    }
+    .slider::before {
+      content: ""; position: absolute; height: 16px; width: 16px;
+      left: 2px; top: 2px; background: white; border-radius: 50%; transition: 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .switch input:checked + .slider { background: #2eb872; }
+    .switch input:checked + .slider::before { transform: translateX(16px); }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar">
+      <div class="progress-bar" aria-hidden="true">
+        <div class="seg green"></div>
+        <div class="seg green"></div>
+        <div class="seg green"></div>
+        <div class="seg amber"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+      <div style="font-weight:600; font-size:15px; margin-top:4px;">Bin Collection Ongoing</div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="title">Bin</span>
+          <span class="meta">Total 287 Bins</span>
+        </div>
+        <div class="progress-bar" style="margin-top:10px;">
+          <div class="seg green" style="flex:200"></div>
+          <div class="seg amber" style="flex:37"></div>
+          <div class="seg red" style="flex:40"></div>
+        </div>
+        <div class="stats">
+          <div class="stat-row">
+            <span class="pin green"></span>
+            <div class="stat-text"><div class="num">200 bins</div><div class="label">Collected from plan</div></div>
+          </div>
+          <div class="stat-row">
+            <span class="pin amber"></span>
+            <div class="stat-text"><div class="num">37 bins</div><div class="label">Collected outside plan</div></div>
+          </div>
+          <div class="stat-row">
+            <span class="pin red"></span>
+            <div class="stat-text"><div class="num">40 bins</div><div class="label">Not Collected</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card row-card">
+        <div class="row-icon">🗑</div>
+        <div><div class="value">3 CBM, 5CBM</div><div class="label">Bin Types</div></div>
+      </div>
+
+      <div class="card row-card">
+        <div class="row-icon">♻</div>
+        <div><div class="value">Recyclable Waste</div><div class="label">Waste Type</div></div>
+      </div>
+
+      <div class="card row-card">
+        <div class="row-icon">👤</div>
+        <div><div class="value">Saim Bin Wali</div><div class="label">Contact Person</div></div>
+      </div>
+
+      <div class="card row-card">
+        <div class="row-icon">📞</div>
+        <div><div class="value">+971 55 789 0123</div><div class="label">Phone</div></div>
+      </div>
+
+      <button class="end-btn">
+        <span class="arrow">→</span>
+        End Collection
+      </button>
+    </aside>
+
+    <div class="map-wrap">
+      <div id="map"></div>
+
+      <div class="route-toggle" role="group" aria-label="Route visibility">
+        <div class="header">Routes</div>
+        <label class="toggle-row">
+          <span class="left">
+            <span class="swatch planned"></span>
+            <span>Planned route</span>
+          </span>
+          <span class="switch">
+            <input type="checkbox" id="toggle-planned" checked />
+            <span class="slider"></span>
+          </span>
+        </label>
+        <label class="toggle-row">
+          <span class="left">
+            <span class="swatch actual"></span>
+            <span>Actual route</span>
+          </span>
+          <span class="switch">
+            <input type="checkbox" id="toggle-actual" checked />
+            <span class="slider"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map', { zoomControl: true }).setView([24.358, 54.520], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(map);
+
+    // Planned route (purple) — snake path through Musaffah blocks
+    const plannedCoords = [
+      [24.372, 54.510], [24.372, 54.527], [24.368, 54.527], [24.368, 54.512],
+      [24.364, 54.512], [24.364, 54.530], [24.360, 54.530], [24.360, 54.514],
+      [24.355, 54.514], [24.355, 54.528], [24.351, 54.528], [24.351, 54.516],
+      [24.347, 54.516], [24.347, 54.530],
+    ];
+
+    // Actual route (green) — vehicle entered from M9 area, slightly offset from planned
+    const actualCoords = [
+      [24.380, 54.560], [24.380, 54.535], [24.373, 54.535], [24.373, 54.527],
+    ];
+
+    const plannedRoute = L.polyline(plannedCoords, {
+      color: '#6b5cff', weight: 5, opacity: 0.9,
+    }).addTo(map);
+
+    const actualRoute = L.polyline(actualCoords, {
+      color: '#2eb872', weight: 5, opacity: 0.95,
+    }).addTo(map);
+
+    // Vehicle marker at the head of the actual route
+    const vehicleIcon = L.divIcon({
+      className: '',
+      html: '<div style="width:26px;height:26px;border-radius:50%;background:#2eb872;border:3px solid #fff;box-shadow:0 0 0 2px #2eb872;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">▶</div>',
+      iconSize: [26, 26],
+      iconAnchor: [13, 13],
+    });
+    const vehicle = L.marker(actualCoords[actualCoords.length - 1], { icon: vehicleIcon }).addTo(map);
+
+    // Random-ish bin pins scattered along the planned path
+    const binIcon = L.divIcon({
+      className: '',
+      html: '<div style="position:relative;width:14px;height:20px;"><div style="position:absolute;top:0;left:0;width:14px;height:14px;border-radius:50%;background:#c0392b;border:2px solid #8a1f1f;"></div><div style="position:absolute;bottom:0;left:6px;width:2px;height:8px;background:#6b1f1f;"></div></div>',
+      iconSize: [14, 20],
+      iconAnchor: [7, 20],
+    });
+
+    function jitter(v, amt) { return v + (Math.random() - 0.5) * amt; }
+    for (let i = 0; i < plannedCoords.length - 1; i++) {
+      const [a, b] = [plannedCoords[i], plannedCoords[i + 1]];
+      const steps = 8;
+      for (let s = 0; s <= steps; s++) {
+        const t = s / steps;
+        const lat = a[0] + (b[0] - a[0]) * t;
+        const lng = a[1] + (b[1] - a[1]) * t;
+        L.marker([jitter(lat, 0.0008), jitter(lng, 0.0008)], { icon: binIcon }).addTo(map);
+      }
+    }
+
+    // Toggle wiring
+    const plannedToggle = document.getElementById('toggle-planned');
+    const actualToggle = document.getElementById('toggle-actual');
+
+    plannedToggle.addEventListener('change', (e) => {
+      if (e.target.checked) plannedRoute.addTo(map);
+      else map.removeLayer(plannedRoute);
+    });
+
+    actualToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        actualRoute.addTo(map);
+        vehicle.addTo(map);
+      } else {
+        map.removeLayer(actualRoute);
+        map.removeLayer(vehicle);
+      }
+    });
+  </script>
+</body>
+</html>
