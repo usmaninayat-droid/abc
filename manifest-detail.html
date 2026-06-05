@@ -49,6 +49,9 @@
     .badge.green { background: var(--green-soft); color: var(--green); }
     .badge.red   { background: var(--red-soft); color: var(--red); }
     .badge.amber { background: var(--amber-soft); color: var(--amber); }
+    .badge.blue  { background: #e4ecff; color: var(--blue); }
+    .badge.grey  { background: #eef1f6; color: #6b7688; }
+    .badge .dotc { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
     /* ---------- Profile overlay ---------- */
     .backdrop { position: absolute; inset: 0 0 0 56px; background: rgba(20,35,65,.18); z-index: 18; display: none; }
@@ -146,6 +149,37 @@
     .map-legend .lg { display: flex; align-items: center; gap: 7px; }
     .map-legend .pin { width: 12px; height: 12px; border-radius: 50%; }
     .pin.start { background: #2f6bff; } .pin.end { background: #16a34a; }
+
+    /* status summary chips on list */
+    .summary { display: flex; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+    .schip { display: flex; align-items: center; gap: 7px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 7px 12px; font-size: 12px; }
+    .schip .sc-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .schip b { font-size: 13px; }
+    .sc-grey { background: #aab3c2; } .sc-amber { background: var(--amber); } .sc-blue { background: var(--blue); } .sc-green { background: var(--green); }
+    tr.removed td { opacity: .5; }
+    tr.removed td b { text-decoration: line-through; }
+
+    /* chain of custody flow */
+    .coc { display: flex; align-items: flex-start; }
+    .coc .cnode { flex: 1; text-align: center; padding: 0 6px; }
+    .coc .cnode .cic { width: 48px; height: 48px; border-radius: 13px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 21px; background: #eef1f6; color: #9aa3b2; }
+    .coc .cnode.done .cic { background: var(--green-soft); color: var(--green); }
+    .coc .cnode.current .cic { background: #e4ecff; color: var(--blue); box-shadow: 0 0 0 5px rgba(47,107,255,.12); }
+    .coc .cnode .cnt { font-weight: 600; font-size: 13px; }
+    .coc .cnode .cns { font-size: 11.5px; color: var(--muted); margin-top: 3px; word-break: break-word; }
+    .coc .carrow { flex: 0 0 28px; text-align: center; color: #cbd5e6; font-size: 20px; margin-top: 13px; }
+
+    /* immutable custody log */
+    .immutable-note { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted); background: #f3f6fb; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; margin-bottom: 14px; }
+    .log-who { font-size: 11.5px; color: var(--blue); margin-top: 3px; font-weight: 500; }
+
+    /* removed banner */
+    .removed-banner { background: var(--red-soft); color: var(--red); border-radius: 10px; padding: 10px 16px; font-size: 13px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    /* workflow action buttons */
+    .btn.warn { background: #fff; border-color: #f0c98a; color: var(--amber); }
+    .btn.danger { background: #fff; border-color: #f1b6b2; color: var(--red); }
+    .btn:disabled { opacity: .45; cursor: default; }
   </style>
 </head>
 <body>
@@ -168,6 +202,7 @@
       <div class="lp-head">
         <h2>Manifests</h2>
         <span class="pill" id="countPill"></span>
+        <div class="summary" id="statusSummary"></div>
       </div>
       <div class="lp-body">
         <div class="toolbar">
@@ -195,11 +230,7 @@
         <div class="content-col">
           <div class="tabs-row">
             <div class="tabs" id="profileTabs"></div>
-            <div class="tabs-actions">
-              <span class="edit-link">✎ Edit</span>
-              <button class="btn">Download PDF</button>
-              <button class="btn primary">Track</button>
-            </div>
+            <div class="tabs-actions" id="profileActions"></div>
           </div>
           <div class="scroll" id="profileScroll"></div>
         </div>
@@ -231,25 +262,73 @@
     function shortLoc(s){ if(!s) return "—"; return s.split(",").map(n=>Number(n).toFixed(4)).join(", "); }
     function truncate(s,n){ return (s && s.length>n) ? s.slice(0,n)+"…" : s; }
     function permitState(m){ if(isRealDate(m.permitExpiryDate) && new Date(m.permitExpiryDate) < TODAY) return "EXPIRED"; return "ACTIVE"; }
-    function lifecycleClass(m){ return {"Delivered":"green","Collected":"amber","Under Collection":"amber"}[m.manifestStatus] || "amber"; }
+    // Distinct, color-coded lifecycle statuses (FAMS v5)
+    function lifecycleClass(m){ return {"Added":"grey","Under Collection":"amber","Collected":"blue","Delivered":"green"}[m.manifestStatus] || "grey"; }
 
+    const TODAY_ISO = "2026-06-05";
+
+    // Official lifecycle: Added → Under Collection → Collected → Delivered
     function steps(m){
+      const collected = isRealDate(m.collectionDate) || m.manifestStatus==="Collected" || m.manifestStatus==="Delivered";
       const defs = [
-        {key:"Created",   date:m.manifestCreationDate, reached:true},
-        {key:"Assigned",  date:m.assignmentDate,        reached:isRealDate(m.assignmentDate)},
-        {key:"Collected", date:m.collectionDate,        reached:isRealDate(m.collectionDate) || m.manifestStatus!=="Under Collection"},
-        {key:"Delivered", date:m.deliveryDate,          reached:m.manifestStatus==="Delivered"}
+        {key:"Added",            date:m.manifestCreationDate, reached:true},
+        {key:"Under Collection", date:isRealDate(m.assignmentDate)?m.assignmentDate:m.manifestCreationDate, reached:true},
+        {key:"Collected",        date:m.collectionDate,       reached:collected},
+        {key:"Delivered",        date:m.deliveryDate,         reached:m.manifestStatus==="Delivered"}
       ];
       let lastIdx = 0; defs.forEach((s,i)=>{ if(s.reached) lastIdx=i; });
       return defs.map((s,i)=>({ ...s, cls: i<lastIdx ? "done" : (i===lastIdx ? "current" : "") }));
     }
 
+    /* ---------- immutable chain-of-custody audit log ---------- */
+    function ensureAudit(m){
+      if(m.audit) return;
+      m.audit = [];
+      m.audit.push({ t:"Added", date:m.manifestCreationDate, who:"System", note:`Manifest issued for vehicle ${m.plateNumber || m.vehicleUniqueId}` });
+      if(isRealDate(m.assignmentDate) && m.assignmentDate!==m.manifestCreationDate)
+        m.audit.push({ t:"Under Collection", date:m.assignmentDate, who:"Dispatcher", note:`Assigned to vehicle ${m.plateNumber || m.vehicleUniqueId}` });
+      if(isRealDate(m.collectionDate))
+        m.audit.push({ t:"Collected", date:m.collectionDate, who:"Field crew", note:`${val(m.wasteType)} collected from ${truncate(m.producerName,42)}` });
+      if(m.manifestStatus==="Delivered" && isRealDate(m.deliveryDate))
+        m.audit.push({ t:"Delivered", date:m.deliveryDate, who:"Facility", note:`Delivered to ${m.facilityName || "licensed facility"}${(m.receivedWeight && m.receivedWeight!=="0") ? " · "+weight(m.receivedWeight) : ""}` });
+    }
+    function logAudit(m, t, note){ ensureAudit(m); m.audit.push({ t, date:TODAY_ISO, who:"Operator", note }); }
+
+    // state machine — strictly sequential transitions
+    function actionsFor(m){
+      if(m.removed) return [{ label:"Restore", act:"restore", cls:"" }];
+      if(m.manifestStatus==="Under Collection") return [{ label:"Mark Collected", act:"collect", cls:"primary" }, { label:"Remove", act:"remove", cls:"danger" }];
+      if(m.manifestStatus==="Collected") return [{ label:"Mark Delivered", act:"deliver", cls:"primary" }, { label:"Un-Collect", act:"uncollect", cls:"warn" }, { label:"Remove", act:"remove", cls:"danger" }];
+      if(m.manifestStatus==="Delivered") return [{ label:"Download PDF", act:"pdf", cls:"" }, { label:"Remove", act:"remove", cls:"danger" }];
+      return [];
+    }
+    function doAction(act){
+      const m = currentManifest; if(!m) return;
+      if(act==="collect"){ m.manifestStatus="Collected"; if(!isRealDate(m.collectionDate)) m.collectionDate=TODAY_ISO; logAudit(m,"Collected",`${val(m.wasteType)} collected from ${truncate(m.producerName,42)}`); }
+      else if(act==="deliver"){ m.manifestStatus="Delivered"; if(!isRealDate(m.deliveryDate)) m.deliveryDate=TODAY_ISO; if(!m.facilityName){ m.facilityName="Licensed Disposal Facility"; m.facilityCity="Abu Dhabi"; } logAudit(m,"Delivered",`Delivered to ${m.facilityName}`); }
+      else if(act==="uncollect"){ m.manifestStatus="Under Collection"; m.collectionDate=""; logAudit(m,"Un-Collected","Collection reverted — error correction"); }
+      else if(act==="remove"){ m.removed=true; logAudit(m,"Removed","Soft-deleted; audit trail preserved"); }
+      else if(act==="restore"){ m.removed=false; logAudit(m,"Restored","Manifest restored"); }
+      else if(act==="pdf"){ return; }
+      renderList();
+      openProfile(currentIndex);
+    }
+
     /* ---------- list ---------- */
     function renderList(){
-      document.getElementById("countPill").textContent = `${MANIFESTS.length} records`;
+      const active = MANIFESTS.filter(m=>!m.removed);
+      document.getElementById("countPill").textContent = `${active.length} active`;
+      // status summary (reflects the Vehicle Manifest Activity Report counts)
+      const count = s => active.filter(m=>m.manifestStatus===s).length;
+      document.getElementById("statusSummary").innerHTML = [
+        ["Under Collection","sc-amber"], ["Collected","sc-blue"], ["Delivered","sc-green"]
+      ].map(([s,c])=>`<span class="schip"><span class="sc-dot ${c}"></span>${s} <b>${count(s)}</b></span>`).join("")
+        + (MANIFESTS.some(m=>m.removed) ? `<span class="schip"><span class="sc-dot sc-grey"></span>Removed <b>${MANIFESTS.filter(m=>m.removed).length}</b></span>` : "");
+
       document.getElementById("manifestRows").innerHTML = MANIFESTS.map((m,i)=>{
         const st = permitState(m); const cls = st==="ACTIVE" ? "green" : "red";
-        return `<tr onclick="openProfile(${i})">
+        const life = m.removed ? `<span class="badge red">Removed</span>` : `<span class="badge ${lifecycleClass(m)}"><span class="dotc"></span>${m.manifestStatus}</span>`;
+        return `<tr class="${m.removed?"removed":""}" onclick="openProfile(${i})">
           <td>${m.id}</td>
           <td><b>${m.manifestNumber}</b></td>
           <td>${m.wasteType}</td>
@@ -258,18 +337,31 @@
           <td class="ell" title="${m.producerName}">${m.producerName}</td>
           <td>${m.estimatedWeight}</td>
           <td>${shortLoc(m.collectionLocation)}</td>
-          <td><span class="badge ${lifecycleClass(m)}">${m.manifestStatus}</span></td>
+          <td>${life}</td>
           <td><span class="badge ${cls}">${st}</span></td>
         </tr>`;
       }).join("");
     }
 
     /* ---------- profile pane builders ---------- */
+    function cocNode(state, icon, title, sub){
+      return `<div class="cnode ${state}"><div class="cic">${icon}</div><div class="cnt">${title}</div><div class="cns">${sub}</div></div>`;
+    }
+    function chainOfCustody(m){
+      const collected = isRealDate(m.collectionDate) || m.manifestStatus==="Collected" || m.manifestStatus==="Delivered";
+      const delivered = m.manifestStatus==="Delivered";
+      const producer = cocNode("done", "🏭", "Producer", truncate(m.producerName,30));
+      const transporter = cocNode(delivered?"done":(collected?"done":"current"), "🚚", "Transporter", `${truncate(m.transporterName,26)}${m.plateNumber?" · "+m.plateNumber:""}`);
+      const facility = cocNode(delivered?"done":"pending", "🏗️", "Facility", delivered ? (m.facilityName||"Licensed facility") : "Awaiting delivery");
+      return `<div class="card-box" style="margin-bottom:20px;"><h3>Chain of Custody</h3>
+        <div class="coc">${producer}<div class="carrow">→</div>${transporter}<div class="carrow">→</div>${facility}</div></div>`;
+    }
     function overviewPane(m){
       const stepHtml = steps(m).map(x=>`
         <div class="step ${x.cls}"><div class="dot">${x.cls==="done"?"✓":""}</div>
         <div class="stitle">${x.key}</div><div class="sdate">${fmtDate(x.date)}</div></div>`).join("");
       return `<div class="stepper">${stepHtml}</div>
+      ${chainOfCustody(m)}
       <div class="detail-cols">
         <div class="col col-l">
           <div class="card-box"><h3>Route</h3>
@@ -332,26 +424,23 @@
       </div>`;
     }
 
-    function timelinePane(m){
+    function custodyPane(m){
+      ensureAudit(m);
       const s = steps(m);
-      const titles = ["Manifest Created","Assigned to Vehicle","Collected from Producer","Delivered to Facility"];
-      const metas = [
-        `Waste type: ${val(m.wasteType)}`,
-        m.plateNumber ? `Vehicle plate ${m.plateNumber}` : "Awaiting vehicle assignment",
-        isRealDate(m.collectionDate) ? `Picked up from ${truncate(m.producerName,46)}` : "Pending collection",
-        m.manifestStatus==="Delivered"
-          ? `${m.facilityName || "Facility"}${(m.receivedWeight && m.receivedWeight!=="0") ? " · received "+weight(m.receivedWeight) : ""}`
-          : "Pending delivery"
-      ];
       const stepHtml = s.map(x=>`
         <div class="step ${x.cls}"><div class="dot">${x.cls==="done"?"✓":""}</div>
         <div class="stitle">${x.key}</div><div class="sdate">${fmtDate(x.date)}</div></div>`).join("");
-      const ev = s.map((x,i)=>`
-        <div class="vevent ${x.cls}"><div class="vdot"></div>
-        <div class="vt">${titles[i]}</div><div class="vd">${fmtDate(x.date)}</div>
-        <div class="vmeta">${metas[i]}</div></div>`).join("");
+      // immutable, append-only log (latest first)
+      const ev = m.audit.slice().reverse().map((e,idx)=>`
+        <div class="vevent ${idx===0?"current":"done"}"><div class="vdot"></div>
+        <div class="vt">${e.t}</div><div class="vd">${fmtDate(e.date)}</div>
+        <div class="vmeta">${e.note}</div><div class="log-who">${e.who}</div></div>`).join("");
       return `<div class="stepper">${stepHtml}</div>
-        <div class="card-box"><h3>Activity</h3><div class="vtimeline">${ev}</div></div>`;
+        <div class="card-box">
+          <h3>Custody Log</h3>
+          <div class="immutable-note">🔒 Immutable chain-of-custody record — append-only audit trail</div>
+          <div class="vtimeline">${ev}</div>
+        </div>`;
     }
 
     function journeyPane(m){
@@ -377,12 +466,12 @@
       </div>`;
     }
 
-    const PANES = { overview: overviewPane, details: null, timeline: timelinePane, journey: journeyPane, documents: documentsPane };
-    const TAB_ORDER = ["overview","details","timeline","journey","documents"];
-    const TAB_LABEL = { overview:"Overview", details:"Details", timeline:"Timeline", journey:"Journey", documents:"Documents" };
+    const TAB_ORDER = ["overview","details","custody","journey","documents"];
+    const TAB_LABEL = { overview:"Overview", details:"Details", custody:"Custody Log", journey:"Journey", documents:"Documents" };
 
     /* ---------- open / close manifest profile ---------- */
     let currentManifest = null;
+    let currentIndex = null;
     let mapInstance = null;
 
     function manifestSvg(){
@@ -402,9 +491,18 @@
     function openProfile(i){
       const m = MANIFESTS[i];
       currentManifest = m;
+      currentIndex = i;
+      ensureAudit(m);
       const st = permitState(m);
       const stCls = st==="ACTIVE" ? "green":"red";
       const other = MANIFESTS[(i+1) % MANIFESTS.length];
+
+      // state-aware workflow actions
+      document.getElementById("profileActions").innerHTML =
+        `<span class="edit-link">✎ Edit</span>` +
+        actionsFor(m).map(a=>`<button class="btn ${a.cls}" onclick="doAction('${a.act}')">${a.label}</button>`).join("");
+
+      const removedBanner = m.removed ? `<div class="removed-banner">🗑️ This manifest has been removed (soft delete). The chain-of-custody audit trail is preserved.</div>` : "";
 
       // top open-entity tabs
       document.getElementById("panelBar").innerHTML = `
@@ -437,8 +535,8 @@
         `<div class="tab ${idx===0?"active":""}" onclick="showPane('${t}',this)">${TAB_LABEL[t]}</div>`).join("");
 
       // panes
-      const builders = { overview: overviewPane(m), details: detailsPane(m,st,stCls), timeline: timelinePane(m), journey: journeyPane(m), documents: documentsPane(m) };
-      document.getElementById("profileScroll").innerHTML = TAB_ORDER.map((t,idx)=>
+      const builders = { overview: overviewPane(m), details: detailsPane(m,st,stCls), custody: custodyPane(m), journey: journeyPane(m), documents: documentsPane(m) };
+      document.getElementById("profileScroll").innerHTML = removedBanner + TAB_ORDER.map((t,idx)=>
         `<div class="pane ${idx===0?"active":""}" id="pane-${t}">${builders[t]}</div>`).join("");
 
       document.getElementById("listPage").classList.add("dimmed");

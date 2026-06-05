@@ -43,16 +43,16 @@
       <img src="01-manifests-list.png" alt="Manifests list" />
     </figure>
     <figure id="overview">
-      <figcaption><div class="t">Manifest profile · Overview</div><div class="d">Manifest #12697920. Left: the manifest hero card with status, tags and key details. Right: lifecycle stepper + Route &amp; Parties summary.</div></figcaption>
+      <figcaption><div class="t">Manifest profile · Overview</div><div class="d">Manifest #12697920. Lifecycle stepper (Added → Under Collection → Collected → Delivered) and the <b>chain of custody</b> (Producer → Transporter → Facility), with color-coded status and state-aware workflow actions.</div></figcaption>
       <img src="02-profile-overview.png" alt="Manifest profile — Overview" />
     </figure>
     <figure id="details">
       <figcaption><div class="t">Manifest profile · Details</div><div class="d">Full section cards: Manifest Information, Producer, Permit &amp; Weight, Transporter &amp; Vehicle, Facility &amp; Delivery.</div></figcaption>
       <img src="03-profile-details.png" alt="Manifest profile — Details" />
     </figure>
-    <figure id="timeline">
-      <figcaption><div class="t">Manifest profile · Timeline</div><div class="d">Lifecycle stepper plus a chronological activity feed.</div></figcaption>
-      <img src="04-profile-timeline.png" alt="Manifest profile — Timeline" />
+    <figure id="custody">
+      <figcaption><div class="t">Manifest profile · Custody Log</div><div class="d">Immutable, append-only chain-of-custody record — every lifecycle state change is logged with date and actor.</div></figcaption>
+      <img src="04-profile-custody.png" alt="Manifest profile — Custody Log" />
     </figure>
     <figure id="journey">
       <figcaption><div class="t">Manifest profile · Journey</div><div class="d">Collection → Facility map. (Offline fallback shown here; renders a live Leaflet map with internet.)</div></figcaption>
@@ -63,8 +63,13 @@
       <img src="06-profile-documents.png" alt="Manifest profile — Documents" />
     </figure>
     <figure id="under">
-      <figcaption><div class="t">Under Collection state</div><div class="d">Manifest #12699047 — amber lifecycle, delivery still pending.</div></figcaption>
+      <figcaption><div class="t">Under Collection state + workflow actions</div><div class="d">Manifest #12699047 — amber lifecycle. State-aware actions (Mark Collected / Remove) enforce the strictly sequential lifecycle.</div></figcaption>
       <img src="07-profile-under-collection.png" alt="Manifest profile — Under Collection" />
+    </figure>
+
+    <figure id="workflow">
+      <figcaption><div class="t">Workflow in action · after “Mark Collected”</div><div class="d">Manifest #12699047 transitioned Under Collection → Collected: the stepper advances, the status turns blue, actions become Mark Delivered / Un-Collect / Remove, and a new immutable entry is appended to the Custody Log.</div></figcaption>
+      <img src="10-after-collect-custodylog.png" alt="After collect — custody log" />
     </figure>
 
     <figure id="offline">
