@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manifest Detail — Preview Gallery</title>
+  <title>Manifest Entity — Preview Gallery</title>
   <style>
     :root { --ink:#1f2733; --muted:#8b94a6; --blue:#2f6bff; --line:#e7ebf2; }
     * { box-sizing:border-box; }
@@ -19,53 +19,52 @@
     figcaption .t { font-weight:600; font-size:15px; }
     figcaption .d { color:var(--muted); font-size:13px; margin-top:3px; }
     figure img { display:block; width:100%; height:auto; }
-    .note { font-size:12px; color:var(--muted); padding:10px 22px; background:#fbfcff; }
     .open-live { display:inline-block; margin-top:14px; font-size:13px; color:#fff; background:var(--blue); padding:9px 16px; border-radius:9px; text-decoration:none; font-weight:600; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Manifest Detail — Preview</h1>
-    <p>Vehicle profile → Manifest tab → manifest detail. Static renders of each screen and sub-tab.</p>
+    <h1>Manifest — Entity Profile Preview</h1>
+    <p>The manifest is now its own entity: a Manifests list → click a row → the manifest's own profile (hero card + Overview / Details / Timeline / Journey / Documents tabs).</p>
     <a class="open-live" href="../manifest-detail.html">Open the live interactive page →</a>
     <div class="toc">
-      <a href="#list">Manifest list</a>
-      <a href="#details">Detail · Details</a>
-      <a href="#timeline">Detail · Timeline</a>
-      <a href="#journey">Detail · Journey</a>
-      <a href="#documents">Detail · Documents</a>
+      <a href="#list">Manifests list</a>
+      <a href="#overview">Profile · Overview</a>
+      <a href="#details">Profile · Details</a>
+      <a href="#timeline">Profile · Timeline</a>
+      <a href="#journey">Profile · Journey</a>
+      <a href="#documents">Profile · Documents</a>
       <a href="#under">Under Collection state</a>
     </div>
   </header>
   <main>
     <figure id="list">
-      <figcaption><div class="t">Manifest list (vehicle profile)</div><div class="d">The Manifest tab table — every row opens its detail view.</div></figcaption>
-      <img src="01-manifest-list.png" alt="Manifest list view" />
+      <figcaption><div class="t">Manifests list</div><div class="d">A standalone manifest entity list (no longer nested in the vehicle profile). Each row opens that manifest's profile.</div></figcaption>
+      <img src="01-manifests-list.png" alt="Manifests list" />
     </figure>
-
+    <figure id="overview">
+      <figcaption><div class="t">Manifest profile · Overview</div><div class="d">Manifest #12697920. Left: the manifest hero card with status, tags and key details. Right: lifecycle stepper + Route &amp; Parties summary.</div></figcaption>
+      <img src="02-profile-overview.png" alt="Manifest profile — Overview" />
+    </figure>
     <figure id="details">
-      <figcaption><div class="t">Detail · Details tab</div><div class="d">Manifest #12697920 (Delivered). Section cards: Manifest Information, Producer, Permit &amp; Weight, Transporter &amp; Vehicle, Facility &amp; Delivery.</div></figcaption>
-      <img src="02-detail-details.png" alt="Manifest detail — Details tab" />
+      <figcaption><div class="t">Manifest profile · Details</div><div class="d">Full section cards: Manifest Information, Producer, Permit &amp; Weight, Transporter &amp; Vehicle, Facility &amp; Delivery.</div></figcaption>
+      <img src="03-profile-details.png" alt="Manifest profile — Details" />
     </figure>
-
     <figure id="timeline">
-      <figcaption><div class="t">Detail · Timeline tab</div><div class="d">Lifecycle stepper (Created → Assigned → Collected → Delivered) plus a chronological activity feed.</div></figcaption>
-      <img src="03-detail-timeline.png" alt="Manifest detail — Timeline tab" />
+      <figcaption><div class="t">Manifest profile · Timeline</div><div class="d">Lifecycle stepper plus a chronological activity feed.</div></figcaption>
+      <img src="04-profile-timeline.png" alt="Manifest profile — Timeline" />
     </figure>
-
     <figure id="journey">
-      <figcaption><div class="t">Detail · Journey tab</div><div class="d">Collection → Facility map. (Shown here in its offline fallback; renders a live Leaflet map when opened with internet.)</div></figcaption>
-      <img src="04-detail-journey.png" alt="Manifest detail — Journey tab" />
+      <figcaption><div class="t">Manifest profile · Journey</div><div class="d">Collection → Facility map. (Offline fallback shown here; renders a live Leaflet map with internet.)</div></figcaption>
+      <img src="05-profile-journey.png" alt="Manifest profile — Journey" />
     </figure>
-
     <figure id="documents">
-      <figcaption><div class="t">Detail · Documents tab</div><div class="d">Manifest PDF, permit (LAC), and weighbridge receipt for delivered manifests.</div></figcaption>
-      <img src="05-detail-documents.png" alt="Manifest detail — Documents tab" />
+      <figcaption><div class="t">Manifest profile · Documents</div><div class="d">Manifest PDF, permit (LAC) and weighbridge receipt for delivered manifests.</div></figcaption>
+      <img src="06-profile-documents.png" alt="Manifest profile — Documents" />
     </figure>
-
     <figure id="under">
-      <figcaption><div class="t">Under Collection state</div><div class="d">Manifest #12699047 — amber lifecycle badge, with Received Facility / Delivery Date still pending (—).</div></figcaption>
-      <img src="06-detail-under-collection.png" alt="Manifest detail — Under Collection" />
+      <figcaption><div class="t">Under Collection state</div><div class="d">Manifest #12699047 — amber lifecycle, delivery still pending.</div></figcaption>
+      <img src="07-profile-under-collection.png" alt="Manifest profile — Under Collection" />
     </figure>
   </main>
 </body>
