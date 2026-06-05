@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manifest Detail — Preview Gallery</title>
+  <style>
+    :root { --ink:#1f2733; --muted:#8b94a6; --blue:#2f6bff; --line:#e7ebf2; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:#eef1f6; color:var(--ink); }
+    header { background:#fff; border-bottom:1px solid var(--line); padding:22px 36px; position:sticky; top:0; z-index:5; }
+    header h1 { margin:0; font-size:20px; }
+    header p { margin:6px 0 0; color:var(--muted); font-size:13.5px; }
+    .toc { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+    .toc a { font-size:12.5px; text-decoration:none; color:var(--blue); background:#eef3ff; padding:6px 12px; border-radius:999px; }
+    main { max-width:1160px; margin:0 auto; padding:30px 24px 60px; }
+    figure { margin:0 0 34px; background:#fff; border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:0 2px 10px rgba(20,40,80,.06); }
+    figcaption { padding:16px 22px; border-bottom:1px solid var(--line); }
+    figcaption .t { font-weight:600; font-size:15px; }
+    figcaption .d { color:var(--muted); font-size:13px; margin-top:3px; }
+    figure img { display:block; width:100%; height:auto; }
+    .note { font-size:12px; color:var(--muted); padding:10px 22px; background:#fbfcff; }
+    .open-live { display:inline-block; margin-top:14px; font-size:13px; color:#fff; background:var(--blue); padding:9px 16px; border-radius:9px; text-decoration:none; font-weight:600; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Manifest Detail — Preview</h1>
+    <p>Vehicle profile → Manifest tab → manifest detail. Static renders of each screen and sub-tab.</p>
+    <a class="open-live" href="../manifest-detail.html">Open the live interactive page →</a>
+    <div class="toc">
+      <a href="#list">Manifest list</a>
+      <a href="#details">Detail · Details</a>
+      <a href="#timeline">Detail · Timeline</a>
+      <a href="#journey">Detail · Journey</a>
+      <a href="#documents">Detail · Documents</a>
+      <a href="#under">Under Collection state</a>
+    </div>
+  </header>
+  <main>
+    <figure id="list">
+      <figcaption><div class="t">Manifest list (vehicle profile)</div><div class="d">The Manifest tab table — every row opens its detail view.</div></figcaption>
+      <img src="01-manifest-list.png" alt="Manifest list view" />
+    </figure>
+
+    <figure id="details">
+      <figcaption><div class="t">Detail · Details tab</div><div class="d">Manifest #12697920 (Delivered). Section cards: Manifest Information, Producer, Permit &amp; Weight, Transporter &amp; Vehicle, Facility &amp; Delivery.</div></figcaption>
+      <img src="02-detail-details.png" alt="Manifest detail — Details tab" />
+    </figure>
+
+    <figure id="timeline">
+      <figcaption><div class="t">Detail · Timeline tab</div><div class="d">Lifecycle stepper (Created → Assigned → Collected → Delivered) plus a chronological activity feed.</div></figcaption>
+      <img src="03-detail-timeline.png" alt="Manifest detail — Timeline tab" />
+    </figure>
+
+    <figure id="journey">
+      <figcaption><div class="t">Detail · Journey tab</div><div class="d">Collection → Facility map. (Shown here in its offline fallback; renders a live Leaflet map when opened with internet.)</div></figcaption>
+      <img src="04-detail-journey.png" alt="Manifest detail — Journey tab" />
+    </figure>
+
+    <figure id="documents">
+      <figcaption><div class="t">Detail · Documents tab</div><div class="d">Manifest PDF, permit (LAC), and weighbridge receipt for delivered manifests.</div></figcaption>
+      <img src="05-detail-documents.png" alt="Manifest detail — Documents tab" />
+    </figure>
+
+    <figure id="under">
+      <figcaption><div class="t">Under Collection state</div><div class="d">Manifest #12699047 — amber lifecycle badge, with Received Facility / Delivery Date still pending (—).</div></figcaption>
+      <img src="06-detail-under-collection.png" alt="Manifest detail — Under Collection" />
+    </figure>
+  </main>
+</body>
+</html>

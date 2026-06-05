@@ -558,11 +558,22 @@
     }
 
     function renderMap(m){
-      if(mapInstance){ mapInstance.remove(); mapInstance = null; }
+      const el = document.getElementById("map");
+      if(!el) return;
       const start = parseLoc(m.collectionLocation);
       const end   = parseLoc(m.facilityLocation);
-      if(!start) return;
 
+      // Graceful fallback when Leaflet is unavailable (e.g. offline / no CDN).
+      if(typeof L === "undefined" || !start){
+        el.innerHTML = `<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#eef2f8;border:1px dashed #cdd6e4;border-radius:12px;color:#8b94a6;text-align:center;padding:20px;">
+          <div style="font-size:30px;">🗺️</div>
+          <div style="font-weight:600;color:#5b6677;">Map preview needs internet connectivity</div>
+          <div style="font-size:12.5px;">Collection: ${start?shortLoc(m.collectionLocation):"—"}${end?" &nbsp;→&nbsp; Facility: "+shortLoc(m.facilityLocation):""}</div>
+        </div>`;
+        return;
+      }
+
+      if(mapInstance){ mapInstance.remove(); mapInstance = null; }
       mapInstance = L.map("map", { zoomControl: true, scrollWheelZoom: false }).setView(start, 11);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "&copy; OpenStreetMap", maxZoom: 19
