@@ -493,52 +493,64 @@
     setFilter('active');
 
     /* ===== Report a Complaint sheet ===== */
-    // English-only, Google-Maps-style icon-tile picker; the search keeps it
-    // usable across the full 26-service catalogue.
+    // Real service catalogue (English), each with its own icon; the search
+    // keeps the Google-Maps-style tile grid usable across all of them.
     const svgWrap = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
     const IC = {
       bin: svgWrap('<path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14"/><path d="M10 11v6"/><path d="M14 11v6"/>'),
-      truck: svgWrap('<path d="M10 17h4V5H2v12h2"/><path d="M14 9h4l3 3v5h-3"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/>'),
-      leaf: svgWrap('<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>'),
-      recycle: svgWrap('<polyline points="22 5 22 10 17 10"/><polyline points="2 19 2 14 7 14"/><path d="M3.7 9a8 8 0 0 1 13.4-2.6L22 10"/><path d="M2 14l4.9 4.6A8 8 0 0 0 20.3 15"/>'),
       droplet: svgWrap('<path d="M12 2.7S6 9 6 13.5a6 6 0 0 0 12 0C18 9 12 2.7 12 2.7Z"/>'),
-      sparkle: svgWrap('<path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9z"/><path d="M5 16l.8 2.2L8 19l-2.2.8L5 22l-.8-2.2L2 19l2.2-.8z"/>'),
-      alert: svgWrap('<path d="M10.3 3.3 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'),
-      plus: svgWrap('<rect x="3" y="3" width="18" height="18" rx="3"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>'),
-      medical: svgWrap('<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>'),
-      zap: svgWrap('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'),
+      droplets: svgWrap('<path d="M7 16.5a3.5 3.5 0 0 1-3.5-3.5C3.5 10.5 7 6.5 7 6.5s3.5 4 3.5 6.5A3.5 3.5 0 0 1 7 16.5Z"/><path d="M16.5 21a3.5 3.5 0 0 1-3.5-3.5c0-2.5 3.5-6.5 3.5-6.5s3.5 4 3.5 6.5A3.5 3.5 0 0 1 16.5 21Z"/>'),
+      sofa: svgWrap('<path d="M4 10V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><rect x="2.5" y="10" width="19" height="7" rx="2"/><path d="M6 17v2"/><path d="M18 17v2"/><line x1="7.5" y1="13.5" x2="16.5" y2="13.5"/>'),
       paw: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6.5" cy="10" r="1.8"/><circle cx="10" cy="7" r="1.8"/><circle cx="14" cy="7" r="1.8"/><circle cx="17.5" cy="10" r="1.8"/><path d="M12 12c-2.8 0-4.8 2-4.8 4.2 0 1.8 1.5 2.3 4.8 2.3s4.8-.5 4.8-2.3C16.8 14 14.8 12 12 12z"/></svg>',
-      map: svgWrap('<polygon points="2 6 9 3 15 6 22 3 22 18 15 21 9 18 2 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/>'),
-      user: svgWrap('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'),
-      move: svgWrap('<polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/>'),
+      box: svgWrap('<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>'),
+      leaf: svgWrap('<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>'),
+      search: svgWrap('<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'),
+      recycle: svgWrap('<polyline points="22 5 22 10 17 10"/><polyline points="2 19 2 14 7 14"/><path d="M3.7 9a8 8 0 0 1 13.4-2.6L22 10"/><path d="M2 14l4.9 4.6A8 8 0 0 0 20.3 15"/>'),
+      bricks: svgWrap('<rect x="3" y="4" width="18" height="16" rx="1"/><line x1="3" y1="9.33" x2="21" y2="9.33"/><line x1="3" y1="14.66" x2="21" y2="14.66"/><line x1="9" y1="4" x2="9" y2="9.33"/><line x1="15" y1="9.33" x2="15" y2="14.66"/><line x1="9" y1="14.66" x2="9" y2="20"/>'),
+      buildings: svgWrap('<rect x="3" y="8" width="7" height="13" rx="1"/><rect x="13" y="3" width="8" height="18" rx="1"/><line x1="5.5" y1="11.5" x2="7.5" y2="11.5"/><line x1="5.5" y1="15" x2="7.5" y2="15"/><line x1="16" y1="7" x2="18" y2="7"/><line x1="16" y1="11" x2="18" y2="11"/><line x1="16" y1="15" x2="18" y2="15"/>'),
+      bag: svgWrap('<path d="M5.5 8h13l-1.3 12.1a1 1 0 0 1-1 .9H7.8a1 1 0 0 1-1-.9L5.5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'),
+      tag: svgWrap('<path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/>'),
+      oil: svgWrap('<path d="M12 3S7 8.5 7 12.5a5 5 0 0 0 10 0C17 8.5 12 3 12 3Z"/><line x1="4" y1="20.5" x2="20" y2="20.5"/>'),
+      broom: svgWrap('<path d="M19 4 12 11"/><path d="M12 11 7.5 20h9L12 11Z"/><line x1="9.7" y1="15.6" x2="14.3" y2="15.6"/>'),
+      landscape: svgWrap('<circle cx="7" cy="7" r="2.5"/><line x1="2" y1="20" x2="22" y2="20"/><path d="M2 20l5-6 3 3 4-5 8 8"/>'),
+      tunnel: svgWrap('<path d="M3 21V12a9 9 0 0 1 18 0v9"/><path d="M8 21v-7a4 4 0 0 1 8 0v7"/><line x1="2" y1="21" x2="22" y2="21"/>'),
+      bridge: svgWrap('<path d="M3 18v-3a9 9 0 0 1 18 0v3"/><line x1="2" y1="18" x2="22" y2="18"/><line x1="8" y1="18" x2="8" y2="13.2"/><line x1="16" y1="18" x2="16" y2="13.2"/>'),
+      footprints: svgWrap('<path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z"/><path d="M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z"/><path d="M16 17h4"/><path d="M4 13h4"/>'),
+      gear: svgWrap('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>'),
+      shrub: svgWrap('<path d="M12 22v-6"/><path d="M9 21h6"/><path d="M12 16a4 4 0 0 0 3.6-5.8A3.3 3.3 0 0 0 12 5a3.3 3.3 0 0 0-3.6 5.2A4 4 0 0 0 12 16Z"/>'),
+      users: svgWrap('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
+      truck: svgWrap('<path d="M10 17h4V5H2v12h2"/><path d="M14 9h4l3 3v5h-3"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/>'),
+      crown: svgWrap('<path d="M2 18h20"/><path d="M3 18 4.5 7l4.5 5 3-6 3 6 4.5-5L20.5 18"/>'),
+      shield: svgWrap('<path d="M12 2 4 5v6c0 5 3.5 8.4 8 10 4.5-1.6 8-5 8-10V5l-8-3Z"/><path d="m9 12 2 2 4-4"/>'),
+      news: svgWrap('<path d="M4 4h13a1 1 0 0 1 1 1v14a1 1 0 0 0 1 1H6a2 2 0 0 1-2-2V4Z"/><path d="M18 8h1.5a1.5 1.5 0 0 1 1.5 1.5V19a1 1 0 0 1-1 1"/><line x1="8" y1="8" x2="14" y2="8"/><line x1="8" y1="12" x2="14" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/>'),
     };
     const services = [
       { name: 'Full Bin Collection', icon: IC.bin, color: '#16a34a' },
-      { name: 'Household Waste Collection', icon: IC.bin, color: '#0d9488' },
-      { name: 'Bulky Waste Collection', icon: IC.truck, color: '#2563eb' },
-      { name: 'Commercial Waste Collection', icon: IC.truck, color: '#4f46e5' },
-      { name: 'Recyclable Waste Collection', icon: IC.recycle, color: '#65a30d' },
-      { name: 'Green Waste Collection', icon: IC.leaf, color: '#16a34a' },
-      { name: 'Garden Waste Collection', icon: IC.leaf, color: '#65a30d' },
-      { name: 'Hazardous Waste Collection', icon: IC.alert, color: '#dc2626' },
-      { name: 'Medical Waste Collection', icon: IC.medical, color: '#e11d48' },
-      { name: 'Electronic Waste Collection', icon: IC.zap, color: '#7c3aed' },
-      { name: 'Construction Waste Removal', icon: IC.truck, color: '#d97706' },
-      { name: 'Residential Waste Removal', icon: IC.truck, color: '#0d9488' },
       { name: 'Bin Washing', icon: IC.droplet, color: '#0891b2' },
-      { name: 'Under Bin Washing', icon: IC.droplet, color: '#0284c7' },
-      { name: 'Waste Container Cleaning', icon: IC.sparkle, color: '#0891b2' },
-      { name: 'Replace / Add Waste Container', icon: IC.plus, color: '#4f46e5' },
-      { name: 'Bin Relocation Request', icon: IC.move, color: '#475569' },
+      { name: 'Under Bin Washing', icon: IC.droplets, color: '#0284c7' },
+      { name: 'Bulky Waste Collection', icon: IC.sofa, color: '#2563eb' },
       { name: 'Dead Animals Collection', icon: IC.paw, color: '#92400e' },
-      { name: 'Internal Streets Cleanliness', icon: IC.map, color: '#d97706' },
-      { name: 'Public Area Cleaning', icon: IC.sparkle, color: '#ea8a00' },
-      { name: 'Illegal Dumping Report', icon: IC.alert, color: '#ea580c' },
-      { name: 'Overflowing Bin', icon: IC.bin, color: '#dc2626' },
-      { name: 'Missed Collection', icon: IC.truck, color: '#dc2626' },
-      { name: 'Damaged Bin', icon: IC.bin, color: '#475569' },
-      { name: 'Report Wrong Practices', icon: IC.alert, color: '#475569' },
-      { name: 'Staff Complaint', icon: IC.user, color: '#475569' },
+      { name: 'Stuff Complaint', icon: IC.box, color: '#475569' },
+      { name: 'Green Waste Collection', icon: IC.leaf, color: '#15803d' },
+      { name: 'Lost Items in Bins', icon: IC.search, color: '#d97706' },
+      { name: 'Recyclable Waste Collection', icon: IC.recycle, color: '#65a30d' },
+      { name: 'C&D Waste Removal', icon: IC.bricks, color: '#b45309' },
+      { name: 'Between Buildings Cleaning', icon: IC.buildings, color: '#4f46e5' },
+      { name: 'Litter Picking Service', icon: IC.bag, color: '#0d9488' },
+      { name: 'Lost Items', icon: IC.tag, color: '#f59e0b' },
+      { name: 'Oil Spill', icon: IC.oil, color: '#334155' },
+      { name: 'Sweeping Sand Service', icon: IC.broom, color: '#ca8a04' },
+      { name: 'Open Areas Cleaning', icon: IC.landscape, color: '#22a06b' },
+      { name: 'Pedestrian Underpasses Cleaning', icon: IC.tunnel, color: '#64748b' },
+      { name: 'Pedestrian Bridge Cleaning', icon: IC.bridge, color: '#2563eb' },
+      { name: 'Walkways Cleaning', icon: IC.footprints, color: '#7c3aed' },
+      { name: 'Mechanical Sweeping', icon: IC.gear, color: '#475569' },
+      { name: 'Bushes Removal', icon: IC.shrub, color: '#15803d' },
+      { name: 'Manpower Allocation', icon: IC.users, color: '#4f46e5' },
+      { name: 'Vehicle/ Equipment Allocation', icon: IC.truck, color: '#1d4ed8' },
+      { name: 'Collection & Transportation Services to Palaces', icon: IC.crown, color: '#a16207' },
+      { name: 'Safety Related', icon: IC.shield, color: '#dc2626' },
+      { name: 'Negative Media Coverage', icon: IC.news, color: '#e11d48' },
     ];
 
     const sheet = document.getElementById('sheet');
@@ -675,7 +687,7 @@
     function renderServices(q = '') {
       const f = services.filter(s => s.name.toLowerCase().includes(q.toLowerCase()));
       svcItems.innerHTML = f.length
-        ? f.map(s => `<button type="button" class="svc-tile${s.name === chosenService ? ' sel' : ''}" data-name="${s.name}"><span class="svc-ic" style="background:${s.color}">${s.icon}</span><span class="svc-name">${s.name}</span></button>`).join('')
+        ? f.map(s => `<button type="button" class="svc-tile${s.name === chosenService ? ' sel' : ''}" data-name="${escapeHtml(s.name)}"><span class="svc-ic" style="background:${s.color}">${s.icon}</span><span class="svc-name">${escapeHtml(s.name)}</span></button>`).join('')
         : '<div class="svc-none">No service found</div>';
     }
     renderServices();
