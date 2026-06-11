@@ -15,8 +15,8 @@
       --ink-2: #475467;
       --muted: #667085;
       --line: #eef1f4;
-      --brand: #22b573;
-      --brand-600: #1aa066;
+      --brand: #22c882;
+      --brand-600: #15a06a;
     }
 
     * { box-sizing: border-box; }
@@ -201,12 +201,13 @@
     .back-btn:hover { background: #e7ebf0; }
     .back-btn svg { width: 19px; height: 19px; }
     .svc-items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-content: start; flex: 1; min-height: 0; overflow-y: auto; padding: 16px; }
-    .svc-tile { display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 13px 6px; border: 1.5px solid transparent; border-radius: 14px; background: #f5f7f9; cursor: pointer; font-family: inherit; transition: background .15s ease, border-color .15s ease; }
-    .svc-tile:hover { background: #eef1f4; }
-    .svc-tile.sel { border-color: var(--brand); background: #eef9f3; }
-    .svc-ic { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; color: #fff; flex-shrink: 0; }
+    .svc-tile { display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 13px 6px; border: 1.5px solid transparent; border-radius: 14px; background: #f9fafb; cursor: pointer; font-family: inherit; transition: background .15s ease, border-color .15s ease; }
+    .svc-tile:hover { background: #f0f2f5; }
+    .svc-tile.sel { border-color: var(--brand); background: #e6f9f1; }
+    .svc-ic { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: #eaecf0; color: #667085; flex-shrink: 0; transition: background .15s ease, color .15s ease; }
     .svc-ic svg { width: 24px; height: 24px; }
-    .svc-name { font-size: 11.5px; font-weight: 600; line-height: 1.25; color: var(--ink-2); text-align: center; }
+    .svc-tile.sel .svc-ic { background: transparent; color: var(--brand-600); }
+    .svc-name { font-size: 11.5px; font-weight: 600; line-height: 1.25; color: #344054; text-align: center; }
     .svc-tile.sel .svc-name { color: var(--brand-600); }
     .svc-none { grid-column: 1 / -1; padding: 18px; text-align: center; color: var(--muted); font-size: 14px; }
 
@@ -687,7 +688,7 @@
     function renderServices(q = '') {
       const f = services.filter(s => s.name.toLowerCase().includes(q.toLowerCase()));
       svcItems.innerHTML = f.length
-        ? f.map(s => `<button type="button" class="svc-tile${s.name === chosenService ? ' sel' : ''}" data-name="${escapeHtml(s.name)}"><span class="svc-ic" style="background:${s.color}">${s.icon}</span><span class="svc-name">${escapeHtml(s.name)}</span></button>`).join('')
+        ? f.map(s => `<button type="button" class="svc-tile${s.name === chosenService ? ' sel' : ''}" data-name="${escapeHtml(s.name)}"><span class="svc-ic">${s.icon}</span><span class="svc-name">${escapeHtml(s.name)}</span></button>`).join('')
         : '<div class="svc-none">No service found</div>';
     }
     renderServices();
