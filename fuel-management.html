@@ -189,26 +189,6 @@
     .btn-sm { padding: 7px 10px; font-size: 13px; }
     .btn:disabled { opacity: .5; cursor: not-allowed; }
 
-    /* ---------- Data-source tiers ---------- */
-    .tiers { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
-    .tier { border: 1px solid var(--n200); border-radius: var(--radius); padding: 14px 16px; position: relative; }
-    .tier .rank { position:absolute; top:14px; right:14px; font-size: 11px; font-weight: 700; color: var(--n400); }
-    .tier h4 { margin: 0 0 4px; font-size: 14px; font-weight: 600; display:flex; align-items:center; gap:8px; }
-    .tier h4 .dot { width: 9px; height: 9px; border-radius: 50%; }
-    .tier p { margin: 0; font-size: 12px; color: var(--n400); line-height: 18px; }
-    .tier.t-live { border-color: var(--blue-bd); } .tier.t-live .dot { background: var(--blue); }
-    .tier.t-actual { border-color: var(--green-bd); } .tier.t-actual .dot { background: var(--green); }
-    .tier.t-est { border-color: var(--n300); } .tier.t-est .dot { background: var(--neutral); }
-
-    /* ---------- How-it-works steps ---------- */
-    .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 24px 0; }
-    .step { background: #fff; border: 1px solid var(--n300); border-radius: var(--radius);
-      padding: 18px 20px; display: flex; gap: 14px; align-items: flex-start; }
-    .step .num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary-light);
-      color: var(--primary); font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .step h4 { margin: 0 0 4px; font-size: 14px; font-weight: 600; }
-    .step p { margin: 0; font-size: 13px; color: var(--n400); line-height: 19px; }
-
     /* ---------- Dropzone ---------- */
     .dropzone {
       border: 1.5px dashed var(--n300); border-radius: var(--radius); padding: 28px 20px;
@@ -386,50 +366,6 @@
 
         <!-- =================== IMPORT TAB =================== -->
         <section class="panel active" id="panel-upload">
-          <div class="card">
-            <div class="card-head">
-              <div class="ico">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-              </div>
-              <div>
-                <h3>Where fuel data comes from</h3>
-                <p>For any vehicle and date range the platform uses the most accurate source available, in this priority order. Importing receipts fills the gap when there's no live telematics.</p>
-              </div>
-            </div>
-            <div class="tiers" style="margin-top:20px;">
-              <div class="tier t-live">
-                <span class="rank">Priority 1</span>
-                <h4><span class="dot"></span>CANbus (live)</h4>
-                <p>Real-time fuel read straight from the vehicle. Most accurate — used whenever available.</p>
-              </div>
-              <div class="tier t-actual">
-                <span class="rank">Priority 2</span>
-                <h4><span class="dot"></span>Fuel receipts (actual)</h4>
-                <p>Actual litres from the fuel-station export, imported monthly. Overrides estimates for the period it covers.</p>
-              </div>
-              <div class="tier t-est">
-                <span class="rank">Priority 3</span>
-                <h4><span class="dot"></span>Estimate</h4>
-                <p>Average consumption × distance. Used only when neither CANbus nor a receipt exists for the period.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="steps">
-            <div class="step">
-              <div class="num">1</div>
-              <div><h4>Download the template</h4><p>A simple CSV: vehicle, date, litres (+ optional meta). One file covers your whole fleet.</p></div>
-            </div>
-            <div class="step">
-              <div class="num">2</div>
-              <div><h4>Paste in your export</h4><p>Drop in the monthly refuelling list from your fuel provider — one row per refuelling event.</p></div>
-            </div>
-            <div class="step">
-              <div class="num">3</div>
-              <div><h4>Upload &amp; review</h4><p>We match rows to vehicles, show a preview, then import the actual litres into each vehicle's history.</p></div>
-            </div>
-          </div>
-
           <div class="grid-2">
             <!-- Download -->
             <div class="card">
