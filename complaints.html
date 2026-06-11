@@ -139,6 +139,78 @@
       .list { grid-template-columns: 1fr; }
       .topbar { flex-direction: column; align-items: flex-start; gap: 14px; }
     }
+
+    /* ---------- Report a Complaint sheet (floating, partial width) ---------- */
+    .scrim {
+      position: fixed; inset: 0; background: rgba(15, 27, 45, .45);
+      opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility .2s ease; z-index: 50;
+    }
+    .scrim.open { opacity: 1; visibility: visible; }
+
+    .sheet {
+      position: fixed; top: 16px; right: 16px; bottom: 16px;
+      width: 480px; max-width: calc(100vw - 32px);
+      background: #fff; border-radius: 20px; z-index: 60;
+      box-shadow: 0 24px 60px -18px rgba(16, 30, 54, .42);
+      display: flex; flex-direction: column; overflow: hidden;
+      transform: translateX(calc(100% + 24px));
+      transition: transform .28s cubic-bezier(.22, .61, .36, 1);
+    }
+    .sheet.open { transform: none; }
+
+    .sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 20px 22px; border-bottom: 1px solid var(--line); }
+    .sheet-head h2 { font-size: 19px; font-weight: 800; margin: 0; }
+    .x-btn { width: 38px; height: 38px; border-radius: 50%; border: none; background: #f2f4f7; color: #475467; cursor: pointer; display: grid; place-items: center; transition: background .15s ease; }
+    .x-btn:hover { background: #e7ebf0; }
+    .x-btn svg { width: 18px; height: 18px; }
+
+    .sheet-body { flex: 1; overflow-y: auto; padding: 22px; display: flex; flex-direction: column; gap: 24px; }
+    .f-label { font-size: 13.5px; font-weight: 700; color: var(--ink); margin: 0 0 10px; }
+    .f-label .req { color: #dc2626; }
+    .f-label .hint { font-weight: 500; color: var(--muted); font-size: 12.5px; }
+
+    /* Photos — first */
+    .photos { display: flex; flex-wrap: wrap; gap: 12px; }
+    .photo { position: relative; width: 96px; height: 96px; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, #94b29a, #5f7f68); }
+    .photo .ph-ic { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(255, 255, 255, .6); }
+    .photo .ph-ic svg { width: 30px; height: 30px; }
+    .photo .rm { position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; border-radius: 50%; background: #ef4444; color: #fff; border: 2px solid #fff; cursor: pointer; display: grid; place-items: center; font-size: 14px; line-height: 1; padding: 0; }
+    .photo .mk { position: absolute; bottom: 6px; right: 6px; width: 27px; height: 27px; border-radius: 8px; background: rgba(15, 27, 45, .72); color: #fff; border: none; cursor: pointer; display: grid; place-items: center; }
+    .photo .mk svg { width: 14px; height: 14px; }
+    .photo .mk.done { background: var(--brand); }
+    .add-photo { width: 96px; height: 96px; border-radius: 12px; border: 1.5px dashed #cbd5e1; background: #fafbfc; color: #98a2b3; cursor: pointer; display: grid; place-items: center; transition: border-color .15s ease, color .15s ease; }
+    .add-photo:hover { border-color: var(--brand); color: var(--brand); }
+    .add-photo svg { width: 24px; height: 24px; }
+
+    /* Service type — searchable list (English only) */
+    .select-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #f7f9fb; border: 1px solid #e3e8ee; border-radius: 12px; padding: 14px 16px; font-family: inherit; font-size: 15px; color: var(--ink); cursor: pointer; text-align: left; }
+    .select-btn .val.ph { color: var(--muted); }
+    .select-btn svg { width: 18px; height: 18px; color: #98a2b3; flex-shrink: 0; transition: transform .2s ease; }
+    .select.open .select-btn { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(34, 181, 115, .12); }
+    .select.open .select-btn svg { transform: rotate(180deg); }
+    .svc-panel { display: none; margin-top: 8px; border: 1px solid #e3e8ee; border-radius: 12px; overflow: hidden; }
+    .select.open .svc-panel { display: block; }
+    .svc-search { position: relative; padding: 10px; border-bottom: 1px solid var(--line); }
+    .svc-search input { width: 100%; font-family: inherit; font-size: 14px; padding: 9px 12px 9px 36px; border: 1px solid #e3e8ee; border-radius: 9px; outline: none; }
+    .svc-search input:focus { border-color: var(--brand); }
+    .svc-search svg { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--muted); }
+    .svc-items { max-height: 232px; overflow-y: auto; }
+    .svc-item { padding: 12px 16px; font-size: 14.5px; color: var(--ink-2); cursor: pointer; border-bottom: 1px solid #f3f5f8; }
+    .svc-item:last-child { border-bottom: none; }
+    .svc-item:hover { background: #f5faf8; color: var(--ink); }
+    .svc-item.sel { color: var(--brand-600); font-weight: 700; background: #eef9f3; }
+    .svc-none { padding: 16px; text-align: center; color: var(--muted); font-size: 14px; }
+
+    /* Note */
+    .note { width: 100%; min-height: 92px; resize: vertical; font-family: inherit; font-size: 15px; color: var(--ink); padding: 13px 15px; border: 1px solid #e3e8ee; border-radius: 12px; background: #f7f9fb; outline: none; }
+    .note:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(34, 181, 115, .12); background: #fff; }
+
+    .sheet-foot { padding: 16px 22px; border-top: 1px solid var(--line); }
+    .btn-submit { width: 100%; background: var(--brand); color: #fff; border: none; font-family: inherit; font-size: 16px; font-weight: 700; padding: 15px; border-radius: 12px; cursor: pointer; transition: background .15s ease; }
+    .btn-submit:hover { background: var(--brand-600); }
+    .btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+    @media (max-width: 560px) { .sheet { inset: 0; border-radius: 0; width: 100vw; max-width: 100vw; } }
   </style>
 </head>
 <body>
@@ -169,7 +241,7 @@
       <div class="wrap">
         <header class="topbar">
           <h1>My Complaints</h1>
-          <button class="btn-primary">
+          <button class="btn-primary" id="open-report">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Report a Complaint
           </button>
@@ -280,6 +352,55 @@
     </main>
   </div>
 
+  <!-- ===== Report a Complaint: floating, partial-width sheet (list stays visible behind) ===== -->
+  <div class="scrim" id="scrim"></div>
+  <aside class="sheet" id="sheet" aria-hidden="true" aria-label="Report a Complaint">
+    <div class="sheet-head">
+      <h2>Report a Complaint</h2>
+      <button class="x-btn" id="close-report" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+    </div>
+
+    <div class="sheet-body">
+      <!-- 1. Photos first -->
+      <div>
+        <p class="f-label">Photos <span class="req">*</span> <span class="hint">— add at least one, tap a photo to mark it up</span></p>
+        <div class="photos" id="photos">
+          <div class="photo">
+            <span class="ph-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></span>
+            <button class="rm" title="Remove" aria-label="Remove photo">&times;</button>
+            <button class="mk" title="Mark up photo" aria-label="Mark up photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+          </div>
+          <button class="add-photo" id="add-photo" title="Add photo" aria-label="Add photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L8 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4"/><line x1="19" y1="3" x2="19" y2="9"/><line x1="22" y1="6" x2="16" y2="6"/><circle cx="12" cy="13" r="3.4"/></svg></button>
+        </div>
+      </div>
+
+      <!-- 2. Service type -->
+      <div>
+        <p class="f-label">Service Type <span class="req">*</span></p>
+        <div class="select" id="select">
+          <button class="select-btn" id="select-btn"><span class="val ph">Select service type</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <div class="svc-panel">
+            <div class="svc-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><line x1="21" y1="21" x2="16.8" y2="16.8"/></svg>
+              <input id="svc-search" type="text" placeholder="Search services…" />
+            </div>
+            <div class="svc-items" id="svc-items"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Note -->
+      <div>
+        <p class="f-label">Note <span class="hint">(optional)</span></p>
+        <textarea class="note" placeholder="Add any extra details…"></textarea>
+      </div>
+    </div>
+
+    <div class="sheet-foot">
+      <button class="btn-submit" id="submit" disabled>Submit Complaint</button>
+    </div>
+  </aside>
+
   <script>
     const tickets = Array.from(document.querySelectorAll('.ticket'));
     const chips   = Array.from(document.querySelectorAll('.chip'));
@@ -305,6 +426,84 @@
 
     // Default view: active (not-resolved) complaints only.
     apply('active');
+
+    /* ===== Report a Complaint sheet ===== */
+    // English-only service list (replaces the bilingual full-screen picker); a
+    // searchable list scales to the full 26-service catalogue.
+    const services = [
+      'Full Bin Collection', 'Household Waste Collection', 'Bulky Waste Collection',
+      'Commercial Waste Collection', 'Recyclable Waste Collection', 'Green Waste Collection',
+      'Garden Waste Collection', 'Hazardous Waste Collection', 'Medical Waste Collection',
+      'Electronic Waste Collection', 'Construction Waste Removal', 'Residential Waste Removal',
+      'Bin Washing', 'Under Bin Washing', 'Waste Container Cleaning', 'Replace / Add Waste Container',
+      'Bin Relocation Request', 'Dead Animals Collection', 'Internal Streets Cleanliness',
+      'Public Area Cleaning', 'Illegal Dumping Report', 'Overflowing Bin', 'Missed Collection',
+      'Damaged Bin', 'Report Wrong Practices', 'Staff Complaint'
+    ];
+
+    const sheet = document.getElementById('sheet');
+    const scrim = document.getElementById('scrim');
+    const select = document.getElementById('select');
+    const selectBtn = document.getElementById('select-btn');
+    const selVal = selectBtn.querySelector('.val');
+    const svcItems = document.getElementById('svc-items');
+    const svcSearch = document.getElementById('svc-search');
+    const submit = document.getElementById('submit');
+    const photos = document.getElementById('photos');
+    const addPhoto = document.getElementById('add-photo');
+    const penSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+    const imgSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>';
+    let chosenService = null;
+
+    function openSheet() { sheet.classList.add('open'); scrim.classList.add('open'); sheet.setAttribute('aria-hidden', 'false'); }
+    function closeSheet() { sheet.classList.remove('open'); scrim.classList.remove('open'); select.classList.remove('open'); sheet.setAttribute('aria-hidden', 'true'); }
+    document.getElementById('open-report').addEventListener('click', openSheet);
+    document.getElementById('close-report').addEventListener('click', closeSheet);
+    scrim.addEventListener('click', closeSheet);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+    function renderServices(q = '') {
+      const f = services.filter(s => s.toLowerCase().includes(q.toLowerCase()));
+      svcItems.innerHTML = f.length
+        ? f.map(s => `<div class="svc-item${s === chosenService ? ' sel' : ''}">${s}</div>`).join('')
+        : '<div class="svc-none">No service found</div>';
+    }
+    renderServices();
+
+    selectBtn.addEventListener('click', () => {
+      select.classList.toggle('open');
+      if (select.classList.contains('open')) { svcSearch.value = ''; renderServices(); svcSearch.focus(); }
+    });
+    svcSearch.addEventListener('input', e => renderServices(e.target.value));
+    svcItems.addEventListener('click', e => {
+      const it = e.target.closest('.svc-item');
+      if (!it) return;
+      chosenService = it.textContent;
+      selVal.textContent = chosenService;
+      selVal.classList.remove('ph');
+      select.classList.remove('open');
+      refreshSubmit();
+    });
+
+    // Photos: tap to mark up (default image-markup entry point), or remove.
+    photos.addEventListener('click', e => {
+      const mk = e.target.closest('.mk');
+      if (mk) { mk.classList.toggle('done'); mk.title = mk.classList.contains('done') ? 'Marked up' : 'Mark up photo'; return; }
+      const rm = e.target.closest('.rm');
+      if (rm) { rm.closest('.photo').remove(); refreshSubmit(); }
+    });
+    addPhoto.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.className = 'photo';
+      div.innerHTML = `<span class="ph-ic">${imgSvg}</span><button class="rm" title="Remove" aria-label="Remove photo">&times;</button><button class="mk" title="Mark up photo" aria-label="Mark up photo">${penSvg}</button>`;
+      photos.insertBefore(div, addPhoto);
+      refreshSubmit();
+    });
+
+    // Photo is mandatory and service must be picked before submitting.
+    function refreshSubmit() { submit.disabled = !(chosenService && photos.querySelectorAll('.photo').length > 0); }
+    refreshSubmit();
+    submit.addEventListener('click', closeSheet);
   </script>
 </body>
 </html>
