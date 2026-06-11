@@ -15,11 +15,11 @@
        Tokens: primary #0072d6, borders #d0d5dd, muted #98a2b3,
        cards = white / 1px border / 4px radius, font Gilroy→Inter.
 
-       Scope reflects the V5 + IWMP Designs Weekly Sync (10 Jun 2026):
-       fuel receipts are imported (monthly fuel-station export, e.g.
-       ADNOC) to capture ACTUAL litres per vehicle. Consumption is
-       derived as litres ÷ km driven. Data priority for monitoring is
-       CANbus (live) > Fuel receipts (actual) > Estimate.
+       Reflects the V5 + IWMP Designs Weekly Sync (10 Jun 2026): fuel
+       receipts are imported (monthly fuel-station export) to capture
+       ACTUAL litres per vehicle; consumption = litres ÷ km driven.
+       Starts on an EMPTY STATE by default (Tadweer pattern); the import
+       area follows the FAMS "Bulk Upload Assets" dropzone pattern.
        =========================================================== */
     :root {
       --primary: #0072d6;
@@ -169,9 +169,8 @@
     .card-head p { margin: 0; color: var(--n400); font-size: 14px; line-height: 22px; }
 
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-    @media (max-width: 1100px) { .grid-2 { grid-template-columns: 1fr; } .grid-4 { grid-template-columns: repeat(2,1fr);} .grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 1100px) { .grid-2 { grid-template-columns: 1fr; } .grid-4 { grid-template-columns: repeat(2,1fr);} }
 
     /* ---------- Buttons ---------- */
     .btn {
@@ -188,18 +187,35 @@
     .btn-ghost:hover { background: var(--n-lightest); }
     .btn-sm { padding: 7px 10px; font-size: 13px; }
     .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .link { background: none; border: none; color: var(--primary); font-weight: 600; font-size: 13px; text-decoration: underline; padding: 4px; }
 
-    /* ---------- Dropzone ---------- */
+    /* ---------- Dropzone (FAMS Bulk-Upload pattern) ---------- */
+    .need-template { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+    .need-template .nt-left { display: flex; align-items: center; gap: 14px; }
+    .need-template .nt-ico { width: 32px; height: 32px; color: var(--primary); flex-shrink: 0; }
+    .need-template .nt-ico svg { width: 32px; height: 32px; }
+    .need-template .nt-title { font-size: 16px; font-weight: 600; color: var(--primary); }
+    .need-template .nt-sub { font-size: 14px; color: var(--n700); margin-top: 2px; }
+    .divider { height: 1px; background: var(--n200); margin: 22px 0; }
+    .ub-label { font-size: 16px; font-weight: 700; margin: 0 0 14px; }
+    .ub-fleet { max-width: 380px; margin-bottom: 16px; }
     .dropzone {
-      border: 1.5px dashed var(--n300); border-radius: var(--radius); padding: 28px 20px;
-      text-align: center; color: var(--n400); background: var(--n-lightest); transition: .15s;
+      border: 1px solid var(--n200); border-radius: var(--radius); background: var(--n-lightest);
+      text-align: center; color: var(--n400); transition: .15s; padding: 48px 20px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 340px;
     }
-    .dropzone.drag { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
-    .dropzone .dz-ico { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1px solid var(--n200);
-      display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: var(--primary); }
-    .dropzone .dz-ico svg { width: 22px; height: 22px; }
-    .dropzone strong { color: var(--n700); }
-    .dropzone .hint { font-size: 12px; margin-top: 6px; }
+    .dropzone.drag { border-color: var(--primary); background: var(--primary-light); }
+    .dropzone .upload-art { margin-bottom: 18px; }
+    .dropzone .dz-text { font-size: 16px; color: var(--n400); }
+    .dropzone .dz-text .browse { color: var(--primary); font-weight: 600; }
+    .dropzone .hint { font-size: 14px; color: var(--neutral); margin-top: 6px; }
+
+    /* ---------- Empty state (Tadweer pattern) ---------- */
+    .empty-state { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 64px 24px; }
+    .empty-state .art { margin-bottom: 22px; }
+    .empty-state h3 { margin: 0 0 8px; font-size: 18px; font-weight: 600; }
+    .empty-state p { margin: 0 0 24px; color: var(--n400); max-width: 460px; line-height: 22px; }
+    .empty-state .es-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 
     /* ---------- Form fields ---------- */
     .field { border: 1px solid var(--n300); border-radius: var(--radius); padding: 9px 12px; background: #fff;
@@ -210,7 +226,6 @@
       width: 100%; background: transparent; padding: 0; }
     .field .suffix { font-size: 14px; font-weight: 600; color: var(--neutral); white-space: nowrap; }
     .field:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,114,214,.12); }
-    .field.readonly { background: var(--n-lightest); }
 
     /* ---------- Tables ---------- */
     .table-wrap { border: 1px solid var(--n300); border-radius: var(--radius); overflow: hidden; background:#fff; }
@@ -340,19 +355,19 @@
         <div class="page-head">
           <h2>Fuel Management</h2>
           <p>Capture <strong>actual</strong> fuel usage by importing monthly fuel receipts — the export your fuel provider (e.g. ADNOC) gives you — for whole fleets at once.
-             Keep a per-vehicle history, turn litres into accurate consumption (litres ÷ km driven), and fall back to estimates only where no receipt or CANbus data exists.</p>
+             Keep a per-vehicle history and turn litres into accurate consumption (litres ÷ km driven).</p>
         </div>
 
         <!-- Tabs -->
         <div class="tabs" id="tabs">
-          <button class="tab active" data-tab="upload">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Import Receipts
-          </button>
-          <button class="tab" data-tab="history">
+          <button class="tab active" data-tab="history">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
             Fuel History
             <span class="pill" id="pendingPill" style="display:none"></span>
+          </button>
+          <button class="tab" data-tab="upload">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Import Receipts
           </button>
           <button class="tab" data-tab="calculator">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="9" y2="11"/><line x1="12" y1="11" x2="13" y2="11"/><line x1="8" y1="15" x2="9" y2="15"/><line x1="12" y1="15" x2="13" y2="15"/><line x1="16" y1="11" x2="16" y2="18"/></svg>
@@ -364,158 +379,164 @@
           </button>
         </div>
 
-        <!-- =================== IMPORT TAB =================== -->
-        <section class="panel active" id="panel-upload">
-          <div class="grid-2">
-            <!-- Download -->
-            <div class="card">
-              <div class="card-head">
-                <div class="ico">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                </div>
-                <div><h3>Fuel Receipt Template</h3><p>Pre-formatted CSV. Only <strong>Vehicle</strong>, <strong>Date</strong> and <strong>Litres</strong> are required — the rest is optional meta.</p></div>
+        <!-- =================== HISTORY TAB (default) =================== -->
+        <section class="panel active" id="panel-history">
+          <!-- Empty state (shown by default until receipts exist) -->
+          <div class="card" id="histEmpty">
+            <div class="empty-state">
+              <div class="art" id="emptyArt"></div>
+              <h3>No fuel receipts yet</h3>
+              <p>Import your monthly fuel receipts to track actual consumption and spend across every fleet. Once imported, you'll see a full per-vehicle history here.</p>
+              <div class="es-actions">
+                <button class="btn btn-primary" id="esImport">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  Import Receipts
+                </button>
+                <button class="btn btn-outline" id="esTemplate">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Download Template
+                </button>
               </div>
-              <div style="margin-top:20px; display:flex; flex-direction:column; gap:14px;">
-                <div class="note">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                  <span>Columns: <strong>Vehicle / Plate No., Fleet, Date, Odometer (km), Liters, Fuel Type, Price per Liter (AED), Station, Receipt No., Notes</strong>. Date can be a day or a period (e.g. <em>Mar 2026</em>). Don't rename the headers.</span>
+              <button class="link" id="esSample" style="margin-top:16px;">or load sample data</button>
+            </div>
+          </div>
+
+          <!-- Populated content -->
+          <div id="histContent" style="display:none;">
+            <div class="grid-4" style="margin-bottom:24px;">
+              <div class="stat">
+                <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg> Total Volume</div>
+                <div class="value" id="statLiters">—</div>
+              </div>
+              <div class="stat">
+                <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Distance Covered</div>
+                <div class="value" id="statDistance">—</div>
+              </div>
+              <div class="stat">
+                <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Avg Consumption</div>
+                <div class="value" id="statCons">—</div>
+              </div>
+              <div class="stat">
+                <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg> Total Spend</div>
+                <div class="value" id="statSpend">—</div>
+              </div>
+            </div>
+
+            <div class="toolbar">
+              <div class="seg" id="histSeg">
+                <button class="active" data-view="receipts">Receipts</button>
+                <button data-view="vehicles">By Vehicle</button>
+              </div>
+              <button class="btn btn-ghost btn-sm" id="btnExport">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export
+              </button>
+            </div>
+
+            <div class="filters">
+              <div class="field grow">
+                <label>Search</label>
+                <div class="control">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#98a2b3" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input id="histSearch" placeholder="Receipt no., plate, station…" />
                 </div>
-                <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                  <button class="btn btn-primary" id="btnDownloadTemplate">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Download Template (.csv)
-                  </button>
-                  <button class="btn btn-ghost" id="btnDownloadSample">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                    Download Sample (filled)
-                  </button>
+              </div>
+              <div class="field">
+                <label>Fleet</label>
+                <div class="control"><select id="histFleet"></select></div>
+              </div>
+              <div class="field" data-receipts-only>
+                <label>Fuel Type</label>
+                <div class="control">
+                  <select id="histFuel"><option value="">All</option><option>Petrol</option><option>Diesel</option></select>
+                </div>
+              </div>
+              <div class="field" data-receipts-only>
+                <label>Status</label>
+                <div class="control">
+                  <select id="histStatus"><option value="">All</option><option>Approved</option><option>Pending</option><option>Rejected</option></select>
                 </div>
               </div>
             </div>
 
-            <!-- Upload -->
-            <div class="card">
-              <div class="card-head">
-                <div class="ico">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                </div>
-                <div><h3>Upload Filled Template</h3><p>Bulk import for the whole fleet at once. We parse each row and let you review before importing.</p></div>
-              </div>
-              <div style="margin-top:20px; display:flex; flex-direction:column; gap:14px;">
-                <div class="field">
-                  <label>Assign to fleet (optional — fills blank rows)</label>
-                  <div class="control">
-                    <select id="uploadFleet"></select>
-                  </div>
-                </div>
-                <div class="dropzone" id="dropzone">
-                  <div class="dz-ico">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                  </div>
-                  <div><strong>Click to browse</strong> or drag &amp; drop your file</div>
-                  <div class="hint">Accepted: .csv (template or fuel-provider export) · max 5 MB</div>
-                  <input type="file" id="fileInput" accept=".csv,text/csv" hidden />
-                </div>
-              </div>
+            <!-- Receipts view -->
+            <div class="table-wrap" id="viewReceipts">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Receipt No.</th>
+                    <th>Vehicle / Fleet</th>
+                    <th class="num-cell">Liters</th>
+                    <th class="num-cell">Odometer (km)</th>
+                    <th class="num-cell">Consumption</th>
+                    <th class="num-cell">Total</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="histBody"></tbody>
+              </table>
+            </div>
+
+            <!-- By-vehicle view -->
+            <div class="table-wrap" id="viewVehicles" style="display:none;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Vehicle</th>
+                    <th>Fleet</th>
+                    <th>Period</th>
+                    <th class="num-cell">Fuel (L)</th>
+                    <th class="num-cell">Distance (km)</th>
+                    <th class="num-cell">Consumption</th>
+                    <th>Data Source</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="vehBody"></tbody>
+              </table>
             </div>
           </div>
         </section>
 
-        <!-- =================== HISTORY TAB =================== -->
-        <section class="panel" id="panel-history">
-          <div class="grid-4" style="margin-bottom:24px;">
-            <div class="stat">
-              <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg> Total Volume</div>
-              <div class="value" id="statLiters">—</div>
-            </div>
-            <div class="stat">
-              <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Distance Covered</div>
-              <div class="value" id="statDistance">—</div>
-            </div>
-            <div class="stat">
-              <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Avg Consumption</div>
-              <div class="value" id="statCons">—</div>
-            </div>
-            <div class="stat">
-              <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg> Total Spend</div>
-              <div class="value" id="statSpend">—</div>
-            </div>
-          </div>
-
-          <div class="toolbar">
-            <div class="seg" id="histSeg">
-              <button class="active" data-view="receipts">Receipts</button>
-              <button data-view="vehicles">By Vehicle</button>
-            </div>
-            <button class="btn btn-ghost btn-sm" id="btnExport">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export
-            </button>
-          </div>
-
-          <div class="filters">
-            <div class="field grow">
-              <label>Search</label>
-              <div class="control">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#98a2b3" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input id="histSearch" placeholder="Receipt no., plate, station…" />
+        <!-- =================== IMPORT TAB =================== -->
+        <section class="panel" id="panel-upload">
+          <div class="card">
+            <!-- Need a template? -->
+            <div class="need-template">
+              <div class="nt-left">
+                <div class="nt-ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <div>
+                  <div class="nt-title">Need a template?</div>
+                  <div class="nt-sub">Download the CSV template — fill in vehicle, date and litres, then upload it back. One file covers your whole fleet.</div>
+                </div>
               </div>
+              <button class="btn btn-outline" id="btnDownloadTemplate">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download Template
+              </button>
             </div>
-            <div class="field">
-              <label>Fleet</label>
-              <div class="control"><select id="histFleet"></select></div>
-            </div>
-            <div class="field" data-receipts-only>
-              <label>Fuel Type</label>
-              <div class="control">
-                <select id="histFuel"><option value="">All</option><option>Petrol</option><option>Diesel</option></select>
-              </div>
-            </div>
-            <div class="field" data-receipts-only>
-              <label>Status</label>
-              <div class="control">
-                <select id="histStatus"><option value="">All</option><option>Approved</option><option>Pending</option><option>Rejected</option></select>
-              </div>
-            </div>
-          </div>
 
-          <!-- Receipts view -->
-          <div class="table-wrap" id="viewReceipts">
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Receipt No.</th>
-                  <th>Vehicle / Fleet</th>
-                  <th class="num-cell">Liters</th>
-                  <th class="num-cell">Odometer (km)</th>
-                  <th class="num-cell">Consumption</th>
-                  <th class="num-cell">Total</th>
-                  <th>Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="histBody"></tbody>
-            </table>
-          </div>
+            <div class="divider"></div>
 
-          <!-- By-vehicle view -->
-          <div class="table-wrap" id="viewVehicles" style="display:none;">
-            <table>
-              <thead>
-                <tr>
-                  <th>Vehicle</th>
-                  <th>Fleet</th>
-                  <th>Period</th>
-                  <th class="num-cell">Fuel (L)</th>
-                  <th class="num-cell">Distance (km)</th>
-                  <th class="num-cell">Consumption</th>
-                  <th>Data Source</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="vehBody"></tbody>
-            </table>
+            <!-- Upload File -->
+            <p class="ub-label">Upload File</p>
+            <div class="field ub-fleet">
+              <label>Assign to fleet (optional — fills blank rows)</label>
+              <div class="control"><select id="uploadFleet"></select></div>
+            </div>
+            <div class="dropzone" id="dropzone">
+              <div class="upload-art" id="uploadArt"></div>
+              <div class="dz-text">Drop files to attach or <span class="browse">browse</span></div>
+              <div class="hint">Accepted format: .csv · max 5 MB · supports multiple fleets in one file</div>
+              <input type="file" id="fileInput" accept=".csv,text/csv" hidden />
+            </div>
+            <div style="margin-top:14px;">
+              <button class="link" id="btnDownloadSample">Download a filled sample instead</button>
+            </div>
           </div>
         </section>
 
@@ -656,31 +677,45 @@
     function svg(name, cls) {
       return '<svg class="'+(cls||'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+I[name]+'</svg>';
     }
+    // Empty-state illustration: stacked receipts in a soft circle (Tadweer-style)
+    const ART_EMPTY =
+      '<svg width="116" height="116" viewBox="0 0 116 116" fill="none">'+
+        '<circle cx="58" cy="58" r="58" fill="#f2f4f7"/>'+
+        '<g transform="rotate(-9 56 58)"><rect x="37" y="33" width="38" height="50" rx="4" fill="#fff" stroke="#d0d5dd" stroke-width="2"/></g>'+
+        '<rect x="42" y="37" width="38" height="50" rx="4" fill="#fff" stroke="#d0d5dd" stroke-width="2"/>'+
+        '<line x1="49" y1="49" x2="73" y2="49" stroke="#e4e7ec" stroke-width="3" stroke-linecap="round"/>'+
+        '<line x1="49" y1="57" x2="73" y2="57" stroke="#e4e7ec" stroke-width="3" stroke-linecap="round"/>'+
+        '<line x1="49" y1="65" x2="65" y2="65" stroke="#e4e7ec" stroke-width="3" stroke-linecap="round"/>'+
+        '<circle cx="88" cy="40" r="2.5" fill="#d0d5dd"/><circle cx="30" cy="82" r="2" fill="#d0d5dd"/><circle cx="86" cy="78" r="1.6" fill="#d0d5dd"/>'+
+      '</svg>';
+    // Dropzone illustration: page + blue upload arrow (FAMS Bulk-Upload style)
+    const ART_UPLOAD =
+      '<svg width="120" height="104" viewBox="0 0 120 104" fill="none">'+
+        '<rect x="34" y="12" width="48" height="62" rx="5" fill="#fff" stroke="#d0d5dd" stroke-width="2"/>'+
+        '<line x1="44" y1="28" x2="72" y2="28" stroke="#e4e7ec" stroke-width="3" stroke-linecap="round"/>'+
+        '<line x1="44" y1="38" x2="72" y2="38" stroke="#e4e7ec" stroke-width="3" stroke-linecap="round"/>'+
+        '<line x1="44" y1="48" x2="62" y2="48" stroke="#e4e7ec" stroke-width="3" stroke-linecap="round"/>'+
+        '<circle cx="80" cy="74" r="18" fill="#0072d6"/>'+
+        '<path d="M80 82 V66 M73 73 L80 66 L87 73" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+
+        '<circle cx="28" cy="18" r="2" fill="#d0d5dd"/><circle cx="96" cy="22" r="2.5" fill="#d0d5dd"/>'+
+      '</svg>';
 
     /* ---------------- Data ---------------- */
     const FLEETS = ['North Region Fleet','South Region Fleet','Central Logistics','Airport Shuttle Fleet'];
     let PRICES = { Petrol: 2.73, Diesel: 2.77 };
     const CCY = 'AED';
 
-    // Per-receipt history (actual litres). distance = km driven for that fill (from the platform),
-    // null when not yet linked — consumption can only be derived once distance is known.
-    let HISTORY = [
+    // Empty by default — the prototype starts on the empty state.
+    let HISTORY = [];
+
+    // Sample receipts used by "Download filled sample" and "load sample data".
+    const SAMPLE_DATA = [
       { date:'2026-06-09', receiptNo:'RC-2026-0457', fleet:'North Region Fleet', vehicle:'DXB-A-12345', fuel:'Diesel', odo:84210, distance:680, liters:120.5, price:2.77, total:333.79, station:'ENOC Al Quoz', status:'Approved', notes:'Monthly top-up' },
       { date:'2026-06-10', receiptNo:'RC-2026-0461', fleet:'South Region Fleet', vehicle:'DXB-K-55821', fuel:'Petrol', odo:41980, distance:410, liters:48.2, price:2.73, total:131.59, station:'ADNOC Musaffah', status:'Pending', notes:'' },
       { date:'2026-06-05', receiptNo:'RC-2026-0448', fleet:'Central Logistics', vehicle:'SHJ-B-90233', fuel:'Diesel', odo:152340, distance:890, liters:210.0, price:2.77, total:581.70, station:'EPPCO Sharjah', status:'Approved', notes:'Long-haul return trip' },
       { date:'2026-06-11', receiptNo:'RC-2026-0470', fleet:'Airport Shuttle Fleet', vehicle:'AUH-C-30188', fuel:'Petrol', odo:22110, distance:520, liters:60.0, price:2.73, total:163.80, station:'ADNOC Airport Rd', status:'Rejected', notes:'Receipt image unreadable' },
       { date:'2026-06-07', receiptNo:'RC-2026-0452', fleet:'North Region Fleet', vehicle:'DXB-A-12346', fuel:'Diesel', odo:77640, distance:610, liters:95.3, price:2.77, total:264.08, station:'ENOC Al Quoz', status:'Approved', notes:'' },
       { date:'2026-06-10', receiptNo:'RC-2026-0466', fleet:'Central Logistics', vehicle:'SHJ-B-90240', fuel:'Diesel', odo:99870, distance:760, liters:180.7, price:2.77, total:500.54, station:'EPPCO Sharjah', status:'Pending', notes:'Awaiting odometer confirmation' }
-    ];
-
-    // Per-vehicle monthly rollup illustrating the data-source priority logic.
-    // (1,456 L mirrors the ADNOC export figure discussed in the V5 sync.)
-    const VEHICLES = [
-      { vehicle:'DXB-A-12345', fleet:'North Region Fleet',    period:'Mar 2026', liters:1456, distance:8200, source:'Receipt' },
-      { vehicle:'DXB-K-55821', fleet:'South Region Fleet',    period:'Mar 2026', liters:612,  distance:5100, source:'CANbus' },
-      { vehicle:'SHJ-B-90233', fleet:'Central Logistics',     period:'Mar 2026', liters:2310, distance:9800, source:'Receipt' },
-      { vehicle:'AUH-C-30188', fleet:'Airport Shuttle Fleet', period:'Mar 2026', liters:880,  distance:7300, source:'Estimate' },
-      { vehicle:'DXB-A-12346', fleet:'North Region Fleet',    period:'Mar 2026', liters:990,  distance:6400, source:'Receipt' }
     ];
 
     const TEMPLATE_HEADERS = ['Vehicle / Plate No.','Fleet','Date','Odometer (km)','Liters','Fuel Type','Price per Liter (AED)','Station','Receipt No.','Notes'];
@@ -691,9 +726,15 @@
     const fmtMoney = n => CCY + ' ' + Number(n).toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const fmtNum = (n, d) => Number(n).toLocaleString('en-AE', { minimumFractionDigits: d||0, maximumFractionDigits: d===undefined?2:d });
     const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-    // consumption (L/100km) from litres + distance; null if distance unknown
     const consumption = (liters, distance) => (distance && distance > 0) ? (liters / distance * 100) : null;
     const consTxt = c => c == null ? '<span class="muted">—</span>' : fmtNum(c,1) + ' <span class="muted">L/100km</span>';
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    function monthLabel(date) {
+      const s = String(date||'').trim();
+      const m = s.match(/^(\d{4})-(\d{2})-\d{2}/);
+      if (m) return MONTHS[(+m[2])-1] + ' ' + m[1];
+      return s || '—';
+    }
 
     function download(filename, text, mime) {
       const blob = new Blob([text], { type: (mime||'text/csv') + ';charset=utf-8;' });
@@ -802,19 +843,25 @@
       $('#histFleet').innerHTML = '<option value="">All fleets</option>' + FLEETS.map(f => '<option>'+esc(f)+'</option>').join('');
     }
 
-    /* ---------------- Download template / sample ---------------- */
-    $('#btnDownloadTemplate').addEventListener('click', () => {
+    /* ---------------- Template / sample downloads ---------------- */
+    function downloadTemplate() {
       download('fuel-receipt-template.csv', toCSV([TEMPLATE_HEADERS]));
       toast('Template downloaded', 'Fill in vehicle, date and litres — one row per refuelling.');
-    });
-    $('#btnDownloadSample').addEventListener('click', () => {
-      const rows = [TEMPLATE_HEADERS,
-        ['DXB-A-12345','North Region Fleet','2026-06-12','84580','118.4','Diesel','2.77','ENOC Al Quoz','RC-2026-0480','Sample row — replace with your data'],
-        ['DXB-K-55821','South Region Fleet','Mar 2026','42230','45.0','Petrol','','ADNOC Musaffah','','Monthly export, no per-day date']
-      ];
+    }
+    function downloadSample() {
+      const rows = [TEMPLATE_HEADERS].concat(SAMPLE_DATA.map(r =>
+        [r.vehicle, r.fleet, r.date, r.odo, r.liters, r.fuel, r.price, r.station, r.receiptNo, r.notes]));
       download('fuel-receipt-sample.csv', toCSV(rows));
       toast('Sample downloaded', 'A filled example showing the expected format.');
-    });
+    }
+    function loadSample() {
+      HISTORY = SAMPLE_DATA.map(r => Object.assign({}, r));
+      setHistView('receipts');
+      renderHistory();
+      toast('Sample data loaded', SAMPLE_DATA.length + ' example receipts added across ' + new Set(SAMPLE_DATA.map(r=>r.fleet)).size + ' fleets.');
+    }
+    $('#btnDownloadTemplate').addEventListener('click', downloadTemplate);
+    $('#btnDownloadSample').addEventListener('click', downloadSample);
 
     /* ---------------- Upload flow ---------------- */
     const dropzone = $('#dropzone'), fileInput = $('#fileInput');
@@ -915,6 +962,7 @@
       $('#viewReceipts').style.display = v === 'receipts' ? '' : 'none';
       $('#viewVehicles').style.display = v === 'vehicles' ? '' : 'none';
       $$('[data-receipts-only]').forEach(el => el.style.display = v === 'receipts' ? '' : 'none');
+      if (v === 'vehicles') { $('#histFuel').value = ''; $('#histStatus').value = ''; }
     }
     $('#histSeg').addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
@@ -922,8 +970,8 @@
     });
 
     function matchSearch(hay) {
-      const q = ($('#histSearch').value||'').toLowerCase().trim();
-      return !q || hay.toLowerCase().includes(q);
+      const qy = ($('#histSearch').value||'').toLowerCase().trim();
+      return !qy || hay.toLowerCase().includes(qy);
     }
     function filteredReceipts() {
       const fl = $('#histFleet').value, fu = $('#histFuel').value, st = $('#histStatus').value;
@@ -934,26 +982,46 @@
         return matchSearch(r.receiptNo+' '+r.vehicle+' '+r.station+' '+r.fleet);
       });
     }
-    function filteredVehicles() {
+    function receiptsFleetSearch() {
       const fl = $('#histFleet').value;
-      return VEHICLES.filter(v => (!fl || v.fleet === fl) && matchSearch(v.vehicle+' '+v.fleet+' '+v.period));
+      return HISTORY.filter(r => (!fl || r.fleet === fl) && matchSearch(r.receiptNo+' '+r.vehicle+' '+r.station+' '+r.fleet));
+    }
+    // Roll receipts up per vehicle for the By Vehicle view.
+    function aggregateVehicles(receipts) {
+      const map = {};
+      receipts.forEach(r => {
+        const k = r.vehicle || '—';
+        if (!map[k]) map[k] = { vehicle:k, fleet:r.fleet, liters:0, distance:0, count:0, months:{}, source:'Receipt' };
+        const m = map[k];
+        m.liters += r.liters; m.distance += (r.distance||0); m.count++; m.months[monthLabel(r.date)] = 1;
+      });
+      return Object.keys(map).map(k => {
+        const m = map[k], mk = Object.keys(m.months);
+        m.period = mk.length === 1 ? mk[0] : mk.length + ' periods';
+        return m;
+      });
     }
 
     function renderHistory() {
-      // stats always from receipts (actual captured fuel)
+      const empty = HISTORY.length === 0;
+      $('#histEmpty').style.display = empty ? '' : 'none';
+      $('#histContent').style.display = empty ? 'none' : 'block';
+      const pending = HISTORY.filter(r => r.status === 'Pending').length;
+      const pill = $('#pendingPill');
+      if (pending) { pill.style.display = ''; pill.textContent = pending + ' pending'; } else pill.style.display = 'none';
+      if (empty) return;
+
+      // stats from filtered receipts
       const rec = filteredReceipts();
       const liters = rec.reduce((a,r)=>a+r.liters,0);
       const dist = rec.reduce((a,r)=>a+(r.distance||0),0);
       const spend = rec.reduce((a,r)=>a+r.total,0);
-      const avgCons = consumption(rec.reduce((a,r)=> a + (r.distance ? r.liters : 0), 0), dist);
+      const litersWithDist = rec.reduce((a,r)=> a + (r.distance ? r.liters : 0), 0);
+      const avgCons = consumption(litersWithDist, dist);
       $('#statLiters').innerHTML = fmtNum(liters,1) + ' <small>L</small>';
       $('#statDistance').innerHTML = fmtNum(dist,0) + ' <small>km</small>';
       $('#statCons').innerHTML = avgCons == null ? '—' : fmtNum(avgCons,1) + ' <small>L/100km</small>';
       $('#statSpend').textContent = fmtMoney(spend);
-
-      const pending = HISTORY.filter(r => r.status === 'Pending').length;
-      const pill = $('#pendingPill');
-      if (pending) { pill.style.display = ''; pill.textContent = pending + ' pending'; } else pill.style.display = 'none';
 
       if (histView === 'receipts') renderReceipts(rec); else renderVehicles();
     }
@@ -985,7 +1053,7 @@
     const SRC_CLASS = { 'CANbus':'live', 'Receipt':'actual', 'Estimate':'estimate' };
     const SRC_LABEL = { 'CANbus':'CANbus (live)', 'Receipt':'Receipt (actual)', 'Estimate':'Estimated' };
     function renderVehicles() {
-      const data = filteredVehicles();
+      const data = aggregateVehicles(receiptsFleetSearch());
       if (!data.length) {
         $('#vehBody').innerHTML = '<tr><td colspan="8"><div class="empty">'+svg('truck')+'<div>No vehicles match your filters.</div></div></td></tr>';
         return;
@@ -996,8 +1064,8 @@
           '<td class="strong">'+esc(v.vehicle)+'</td>'+
           '<td>'+esc(v.fleet)+'</td>'+
           '<td>'+esc(v.period)+'</td>'+
-          '<td class="num-cell strong">'+fmtNum(v.liters,0)+'</td>'+
-          '<td class="num-cell">'+fmtNum(v.distance,0)+'</td>'+
+          '<td class="num-cell strong">'+fmtNum(v.liters,1)+'</td>'+
+          '<td class="num-cell">'+(v.distance?fmtNum(v.distance,0):'<span class="muted">—</span>')+'</td>'+
           '<td class="num-cell">'+consTxt(c)+'</td>'+
           '<td><span class="badge '+SRC_CLASS[v.source]+'">'+SRC_LABEL[v.source]+'</span></td>'+
           '<td><div class="row-actions"><button class="icon-btn" data-veh="'+i+'" title="View fuel history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg></button></div></td>'+
@@ -1027,17 +1095,16 @@
       const recs = HISTORY.filter(r => r.vehicle === v.vehicle);
       const c = consumption(v.liters, v.distance);
       const di = (k,val) => '<div class="di"><div class="k">'+k+'</div><div class="v">'+val+'</div></div>';
-      const rowsHtml = recs.length ? recs.map(r =>
+      const rowsHtml = recs.map(r =>
         '<tr><td>'+esc(r.date)+'</td><td class="strong">'+esc(r.receiptNo)+'</td><td class="num-cell strong">'+fmtNum(r.liters,1)+' L</td>'+
-        '<td class="num-cell">'+consTxt(consumption(r.liters,r.distance))+'</td><td class="num-cell">'+fmtMoney(r.total)+'</td></tr>').join('')
-        : '<tr><td colspan="5"><div class="empty" style="padding:24px;">'+svg('file')+'<div>No uploaded receipts for this period — figure derived from '+SRC_LABEL[v.source]+'.</div></div></td></tr>';
+        '<td class="num-cell">'+consTxt(consumption(r.liters,r.distance))+'</td><td class="num-cell">'+fmtMoney(r.total)+'</td></tr>').join('');
       openModal(
         '<div class="modal-head"><div><h3>'+esc(v.vehicle)+'</h3><p>'+esc(v.fleet)+' · fuel history</p></div>'+xBtn+'</div>'+
         '<div class="modal-body">'+
           '<div class="detail-grid" style="margin-bottom:18px;">'+
             di('Period', esc(v.period))+di('Data source', '<span class="badge '+SRC_CLASS[v.source]+'">'+SRC_LABEL[v.source]+'</span>')+
-            di('Fuel used', '<strong>'+fmtNum(v.liters,0)+' L</strong>')+di('Distance', fmtNum(v.distance,0)+' km')+
-            di('Consumption', c==null?'—':'<strong>'+fmtNum(c,1)+' L/100km</strong>')+di('Vehicles in fleet', esc(v.fleet))+
+            di('Fuel used', '<strong>'+fmtNum(v.liters,1)+' L</strong>')+di('Distance', v.distance?fmtNum(v.distance,0)+' km':'—')+
+            di('Consumption', c==null?'—':'<strong>'+fmtNum(c,1)+' L/100km</strong>')+di('Receipts', recs.length)+
           '</div>'+
           '<div class="table-wrap"><table><thead><tr><th>Date</th><th>Receipt No.</th><th class="num-cell">Liters</th><th class="num-cell">Consumption</th><th class="num-cell">Total</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
         '</div>'+
@@ -1051,7 +1118,7 @@
     });
     $('#btnExport').addEventListener('click', () => {
       if (histView === 'vehicles') {
-        const data = filteredVehicles();
+        const data = aggregateVehicles(receiptsFleetSearch());
         if (!data.length) { toast('Nothing to export', 'No vehicles match your filters.', 'error'); return; }
         const rows = [['Vehicle','Fleet','Period','Liters','Distance (km)','Consumption (L/100km)','Data Source']]
           .concat(data.map(v => [v.vehicle, v.fleet, v.period, v.liters, v.distance, (consumption(v.liters,v.distance)||0).toFixed(1), v.source]));
@@ -1066,6 +1133,11 @@
         toast('Exported', data.length + ' receipt'+(data.length>1?'s':'')+' exported to CSV.');
       }
     });
+
+    // Empty-state actions
+    $('#esImport').addEventListener('click', () => activateTab('upload'));
+    $('#esTemplate').addEventListener('click', downloadTemplate);
+    $('#esSample').addEventListener('click', loadSample);
 
     /* ---------------- Consumption calculator ---------------- */
     const calcBody = $('#calcBody');
@@ -1132,8 +1204,10 @@
     /* ---------------- Init ---------------- */
     buildChrome();
     fillFleetSelects();
+    $('#emptyArt').innerHTML = ART_EMPTY;
+    $('#uploadArt').innerHTML = ART_UPLOAD;
     setHistView('receipts');
-    renderHistory();
+    renderHistory();          // shows empty state (HISTORY is empty)
     calcRow('North Region Fleet','Diesel', 1456, 8200);
     calcRow('South Region Fleet','Petrol', 612, 5100);
     recalc();
