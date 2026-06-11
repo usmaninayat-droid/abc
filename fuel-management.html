@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAMS — Fuel Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ===========================================================
+       FAMS Web Portal — Fuel Management
+       Styling mirrors the FAMS "Preferences" Figma screen:
+       primary blue rail + module rail + settings nav + content.
+       Tokens: primary #0072d6, borders #d0d5dd, muted #98a2b3,
+       cards = white / 1px border / 4px radius, font Gilroy→Inter.
+       =========================================================== */
+    :root {
+      --primary: #0072d6;
+      --primary-hover: #0063bb;
+      --primary-light: #e6f1fb;
+      --primary-200: #8abeec;
+      --n900: #101828;
+      --n700: #344054;
+      --n600: #475467;
+      --neutral: #667085;
+      --n400: #98a2b3;
+      --n300: #d0d5dd;
+      --n200: #eaecf0;
+      --n-lightest: #f9fafb;
+      --white: #ffffff;
+      --black: #000000;
+      --green: #12b76a; --green-bg: #ecfdf3; --green-text: #027a48; --green-bd:#abefc6;
+      --amber: #f79009; --amber-bg: #fffaeb; --amber-text: #b54708; --amber-bd:#fedf89;
+      --red:   #f04438; --red-bg: #fef3f2;   --red-text: #b42318;   --red-bd:#fecdca;
+      --radius: 4px;
+      --shadow-sm: 0 1px 2px rgba(16,24,40,0.05);
+      --shadow-md: 0 4px 12px rgba(16,24,40,0.12);
+      --shadow-lg: 0 12px 32px rgba(16,24,40,0.18);
+      --font: 'Gilroy', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--n900);
+      background: var(--n-lightest);
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+    svg { display: block; }
+    button { font-family: inherit; cursor: pointer; }
+    input, select { font-family: inherit; }
+
+    .portal { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+
+    /* ---------- Primary blue rail ---------- */
+    .rail-primary {
+      width: 52px; flex-shrink: 0; background: var(--primary);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: space-between; padding: 16px 0;
+    }
+    .rail-primary .logo {
+      width: 28px; height: 28px; border-radius: 6px; background: #fff;
+      color: var(--primary); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; margin-bottom: 24px;
+    }
+    .rail-primary .grp { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+    .rail-icon {
+      width: 28px; height: 28px; border-radius: 4px; display: flex;
+      align-items: center; justify-content: center; color: rgba(255,255,255,0.85);
+    }
+    .rail-icon.active { background: rgba(255,255,255,0.25); color: #fff; }
+    .rail-icon svg { width: 18px; height: 18px; }
+    .rail-avatar { width: 28px; height: 28px; border-radius: 50%; background: #1681df;
+      display: flex; align-items: center; justify-content: center; color:#fff; }
+
+    /* ---------- Module (white) rail ---------- */
+    .rail-modules {
+      width: 64px; flex-shrink: 0; background: var(--white);
+      border-right: 1px solid var(--n300); display: flex; flex-direction: column;
+      align-items: center; gap: 14px; padding: 16px 0; overflow-y: auto;
+    }
+    .mod-icon {
+      width: 34px; height: 34px; border-radius: 4px; display: flex; align-items: center;
+      justify-content: center; color: var(--neutral); box-shadow: var(--shadow-sm);
+    }
+    .mod-icon svg { width: 18px; height: 18px; }
+    .mod-icon.active { background: var(--primary-light); color: var(--primary); }
+    .mod-icon:hover { color: var(--primary); }
+
+    /* ---------- Settings / section nav ---------- */
+    .section-nav {
+      width: 280px; flex-shrink: 0; background: var(--white);
+      border-right: 1px solid var(--n300); padding: 28px 20px;
+      overflow-y: auto; display: flex; flex-direction: column; gap: 28px;
+    }
+    .go-back { display: flex; align-items: center; gap: 4px; color: var(--n400);
+      font-size: 11px; font-weight: 500; }
+    .go-back svg { width: 12px; height: 12px; transform: rotate(90deg); }
+    .nav-title { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .nav-title .ico { width: 28px; height: 28px; border-radius: 4px;
+      background: rgba(138,190,236,0.4); display:flex; align-items:center; justify-content:center; color: var(--primary); }
+    .nav-title .ico svg { width: 18px; height: 18px; }
+    .nav-title h1 { font-size: 16px; font-weight: 600; margin: 0; }
+    .nav-group { display: flex; flex-direction: column; }
+    .nav-group .heading { font-size: 12px; font-weight: 600; color: var(--n400); padding: 8px 0; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 11px 12px;
+      border-radius: var(--radius); color: var(--n600); font-size: 14px; font-weight: 500;
+      text-decoration: none; white-space: nowrap; cursor: pointer;
+    }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .nav-item:hover { background: var(--n-lightest); }
+    .nav-item.active { background: var(--primary-light); color: var(--n900); font-weight: 600; }
+    .nav-item.active svg { color: var(--primary); }
+
+    /* ---------- Content ---------- */
+    .content { flex: 1; overflow-y: auto; }
+    .content-inner { max-width: 1320px; padding: 24px 32px 64px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    .breadcrumb { display: flex; align-items: center; gap: 6px; color: var(--n400); font-size: 11px; font-weight: 500; }
+    .breadcrumb svg { width: 8px; height: 8px; }
+    .breadcrumb .current { color: var(--n600); }
+    .search {
+      width: 340px; height: 34px; border: 1px solid var(--n300); border-radius: var(--radius);
+      display: flex; align-items: center; gap: 8px; padding: 0 10px; background: #fff; color: var(--n400);
+    }
+    .search svg { width: 16px; height: 16px; }
+    .search input { border: none; outline: none; flex: 1; font-size: 12px; color: var(--n700); background: transparent; }
+
+    .page-head { margin-bottom: 24px; }
+    .page-head h2 { font-size: 24px; font-weight: 700; margin: 0 0 6px; }
+    .page-head p { margin: 0; color: var(--n400); font-size: 14px; max-width: 820px; line-height: 22px; }
+
+    /* ---------- Tabs ---------- */
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--n200); margin-bottom: 24px; }
+    .tab {
+      background: none; border: none; padding: 12px 14px; font-size: 14px; font-weight: 600;
+      color: var(--neutral); border-bottom: 2px solid transparent; margin-bottom: -1px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .tab svg { width: 16px; height: 16px; }
+    .tab:hover { color: var(--primary); }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab .pill { background: var(--amber-bg); color: var(--amber-text); border-radius: 999px;
+      font-size: 11px; font-weight: 700; padding: 1px 7px; }
+
+    .panel { display: none; }
+    .panel.active { display: block; animation: fade .18s ease; }
+    @keyframes fade { from { opacity: 0; transform: translateY(4px);} to { opacity:1; transform:none; } }
+
+    /* ---------- Card ---------- */
+    .card { background: var(--white); border: 1px solid var(--n300); border-radius: var(--radius); padding: 24px; }
+    .card + .card { margin-top: 24px; }
+    .card-head { display: flex; gap: 12px; align-items: flex-start; }
+    .card-head .ico { width: 44px; height: 44px; border-radius: var(--radius); background: var(--n-lightest);
+      display: flex; align-items: center; justify-content: center; color: var(--primary); flex-shrink: 0; }
+    .card-head .ico svg { width: 24px; height: 24px; }
+    .card-head h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+    .card-head p { margin: 0; color: var(--n400); font-size: 14px; line-height: 22px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    @media (max-width: 1100px) { .grid-2 { grid-template-columns: 1fr; } .grid-4 { grid-template-columns: repeat(2,1fr);} }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 16px; border-radius: var(--radius); font-size: 14px; font-weight: 600;
+      border: 1px solid transparent; white-space: nowrap;
+    }
+    .btn svg { width: 18px; height: 18px; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-outline { background: #fff; color: var(--primary); border-color: var(--primary); }
+    .btn-outline:hover { background: var(--primary-light); }
+    .btn-ghost { background: #fff; color: var(--n700); border-color: var(--n300); }
+    .btn-ghost:hover { background: var(--n-lightest); }
+    .btn-sm { padding: 7px 10px; font-size: 13px; }
+    .btn-icon { padding: 7px; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ---------- How-it-works steps ---------- */
+    .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 24px; }
+    .step { background: #fff; border: 1px solid var(--n300); border-radius: var(--radius);
+      padding: 18px 20px; display: flex; gap: 14px; align-items: flex-start; }
+    .step .num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary-light);
+      color: var(--primary); font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step h4 { margin: 0 0 4px; font-size: 14px; font-weight: 600; }
+    .step p { margin: 0; font-size: 13px; color: var(--n400); line-height: 19px; }
+    .step .connector { color: var(--n300); }
+
+    /* ---------- Dropzone ---------- */
+    .dropzone {
+      border: 1.5px dashed var(--n300); border-radius: var(--radius); padding: 28px 20px;
+      text-align: center; color: var(--n400); background: var(--n-lightest); transition: .15s;
+    }
+    .dropzone.drag { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+    .dropzone .dz-ico { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1px solid var(--n200);
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: var(--primary); }
+    .dropzone .dz-ico svg { width: 22px; height: 22px; }
+    .dropzone strong { color: var(--n700); }
+    .dropzone .hint { font-size: 12px; margin-top: 6px; }
+
+    /* ---------- Form fields ---------- */
+    .field { border: 1px solid var(--n300); border-radius: var(--radius); padding: 9px 12px; background: #fff;
+      display: flex; flex-direction: column; gap: 3px; }
+    .field label { font-size: 10px; font-weight: 600; color: var(--n400); }
+    .field .control { display: flex; align-items: center; gap: 8px; }
+    .field input, .field select { border: none; outline: none; font-size: 14px; font-weight: 600; color: var(--n900);
+      width: 100%; background: transparent; padding: 0; }
+    .field .suffix { font-size: 14px; font-weight: 600; color: var(--neutral); white-space: nowrap; }
+    .field:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,114,214,.12); }
+    .field.readonly { background: var(--n-lightest); }
+
+    /* ---------- Tables ---------- */
+    .table-wrap { border: 1px solid var(--n300); border-radius: var(--radius); overflow: hidden; background:#fff; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { text-align: left; background: var(--n-lightest); color: var(--n600); font-weight: 600;
+      padding: 11px 16px; border-bottom: 1px solid var(--n200); white-space: nowrap; font-size: 12px; }
+    tbody td { padding: 13px 16px; border-bottom: 1px solid var(--n200); color: var(--n700); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fcfcfd; }
+    td .strong { font-weight: 600; color: var(--n900); }
+    td .sub { color: var(--n400); font-size: 12px; }
+    .num-cell { text-align: right; font-variant-numeric: tabular-nums; }
+
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: 999px;
+      font-size: 12px; font-weight: 600; border: 1px solid transparent; }
+    .badge::before { content:""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .badge.approved { background: var(--green-bg); color: var(--green-text); border-color: var(--green-bd); }
+    .badge.pending  { background: var(--amber-bg); color: var(--amber-text); border-color: var(--amber-bd); }
+    .badge.rejected { background: var(--red-bg); color: var(--red-text); border-color: var(--red-bd); }
+    .chip { background: var(--n-lightest); border: 1px solid var(--n200); border-radius: 999px; padding: 2px 9px;
+      font-size: 12px; font-weight: 600; color: var(--n600); }
+
+    /* ---------- Stat cards ---------- */
+    .stat { background: #fff; border: 1px solid var(--n300); border-radius: var(--radius); padding: 16px 18px; }
+    .stat .label { display:flex; align-items:center; gap:8px; color: var(--n400); font-size: 13px; font-weight: 500; }
+    .stat .label svg { width: 16px; height: 16px; }
+    .stat .value { font-size: 24px; font-weight: 700; margin-top: 8px; }
+    .stat .value small { font-size: 13px; font-weight: 600; color: var(--n400); }
+
+    /* ---------- Filters bar ---------- */
+    .filters { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 16px; }
+    .filters .field { min-width: 170px; }
+    .filters .grow { flex: 1; min-width: 200px; }
+    .section-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 16px; flex-wrap: wrap; }
+    .section-bar h3 { margin: 0; font-size: 16px; font-weight: 600; }
+
+    .row-actions { display: flex; gap: 6px; }
+    .icon-btn { width: 30px; height: 30px; border: 1px solid var(--n300); border-radius: var(--radius);
+      background: #fff; display: inline-flex; align-items: center; justify-content: center; color: var(--n600); }
+    .icon-btn:hover { background: var(--n-lightest); color: var(--primary); border-color: var(--primary-200); }
+    .icon-btn svg { width: 16px; height: 16px; }
+
+    .empty { text-align: center; padding: 48px 20px; color: var(--n400); }
+    .empty svg { width: 40px; height: 40px; margin-bottom: 10px; color: var(--n300); }
+
+    /* ---------- Calculator ---------- */
+    .calc-table .field { border: none; padding: 0; }
+    .calc-table td { padding: 8px 10px; }
+    .calc-table input, .calc-table select {
+      border: 1px solid var(--n300); border-radius: var(--radius); padding: 8px 10px; font-weight: 500;
+    }
+    .calc-table input:focus, .calc-table select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,114,214,.12); }
+    .calc-out { font-weight: 700; color: var(--n900); }
+    tfoot td { background: var(--primary-light); font-weight: 700; color: var(--n900); padding: 13px 16px; border-top: 1px solid var(--primary-200); }
+
+    .result-grid { display:grid; grid-template-columns: repeat(3,1fr); gap:16px; margin-top: 20px; }
+    .result { background: var(--n-lightest); border:1px solid var(--n200); border-radius: var(--radius); padding:16px 18px; }
+    .result .lbl { color: var(--n400); font-size: 13px; font-weight: 500; }
+    .result .val { font-size: 22px; font-weight: 700; margin-top: 6px; }
+    .result.primary { background: var(--primary); border-color: var(--primary); }
+    .result.primary .lbl { color: rgba(255,255,255,.8); }
+    .result.primary .val { color: #fff; }
+
+    /* ---------- Toast ---------- */
+    .toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 3000; }
+    .toast { background: #fff; border: 1px solid var(--n200); border-left: 4px solid var(--green);
+      border-radius: var(--radius); box-shadow: var(--shadow-md); padding: 12px 16px; display: flex; gap: 10px;
+      align-items: center; min-width: 280px; animation: slidein .2s ease; }
+    .toast.error { border-left-color: var(--red); }
+    .toast .t-ico { color: var(--green); } .toast.error .t-ico { color: var(--red); }
+    .toast .t-ico svg { width: 20px; height: 20px; }
+    .toast .t-title { font-weight: 600; font-size: 14px; }
+    .toast .t-msg { font-size: 12px; color: var(--n400); }
+    @keyframes slidein { from { opacity: 0; transform: translateX(20px);} to { opacity:1; transform:none; } }
+
+    /* ---------- Modal ---------- */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(16,24,40,.5); display: none;
+      align-items: center; justify-content: center; z-index: 2000; padding: 24px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #fff; border-radius: 8px; box-shadow: var(--shadow-lg); width: 100%; max-width: 880px;
+      max-height: 88vh; display: flex; flex-direction: column; animation: fade .18s ease; }
+    .modal-head { padding: 20px 24px; border-bottom: 1px solid var(--n200); display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .modal-head h3 { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
+    .modal-head p { margin: 0; color: var(--n400); font-size: 13px; }
+    .modal-body { padding: 20px 24px; overflow-y: auto; }
+    .modal-foot { padding: 16px 24px; border-top: 1px solid var(--n200); display: flex; justify-content: flex-end; gap: 12px; }
+    .close-x { background: none; border: none; color: var(--n400); padding: 4px; }
+    .close-x svg { width: 22px; height: 22px; }
+
+    .note { background: var(--primary-light); border: 1px solid var(--primary-200); border-radius: var(--radius);
+      padding: 12px 14px; font-size: 13px; color: var(--n700); display: flex; gap: 10px; align-items: flex-start; }
+    .note svg { width: 18px; height: 18px; color: var(--primary); flex-shrink: 0; margin-top: 1px; }
+
+    .detail-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px 24px; }
+    .detail-grid .di .k { font-size: 12px; color: var(--n400); font-weight: 500; }
+    .detail-grid .di .v { font-size: 14px; color: var(--n900); font-weight: 600; margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <div class="portal">
+    <nav class="rail-primary" id="railPrimary"></nav>
+    <nav class="rail-modules" id="railModules"></nav>
+    <aside class="section-nav" id="sectionNav"></aside>
+
+    <main class="content">
+      <div class="content-inner">
+        <!-- Topbar -->
+        <div class="topbar">
+          <div class="breadcrumb">
+            <span>Settings</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            <span class="current">Fuel Management</span>
+          </div>
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input placeholder="Search receipts, fleets, stations…" />
+          </div>
+        </div>
+
+        <!-- Page head -->
+        <div class="page-head">
+          <h2>Fuel Management</h2>
+          <p>Download the standard fuel receipt template, fill in your fleet's refuelling data, and upload it back here.
+             Track every receipt across multiple fleets, keep a full history, and estimate fuel costs with the built-in calculator.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" id="tabs">
+          <button class="tab active" data-tab="upload">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload Receipts
+          </button>
+          <button class="tab" data-tab="history">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+            Receipt History
+            <span class="pill" id="pendingPill" style="display:none"></span>
+          </button>
+          <button class="tab" data-tab="calculator">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="9" y2="11"/><line x1="12" y1="11" x2="13" y2="11"/><line x1="8" y1="15" x2="9" y2="15"/><line x1="12" y1="15" x2="13" y2="15"/><line x1="16" y1="11" x2="16" y2="18"/></svg>
+            Fuel Cost Calculator
+          </button>
+          <button class="tab" data-tab="prices">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>
+            Fuel Prices
+          </button>
+        </div>
+
+        <!-- =================== UPLOAD TAB =================== -->
+        <section class="panel active" id="panel-upload">
+          <div class="steps">
+            <div class="step">
+              <div class="num">1</div>
+              <div><h4>Download the template</h4><p>Get the standard CSV receipt template with all required columns.</p></div>
+            </div>
+            <div class="step">
+              <div class="num">2</div>
+              <div><h4>Fill in receipt data</h4><p>Enter refuelling details for one or many fleets — one row per receipt.</p></div>
+            </div>
+            <div class="step">
+              <div class="num">3</div>
+              <div><h4>Upload it back here</h4><p>Drop the completed file below. We'll validate and add it to history.</p></div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Download -->
+            <div class="card">
+              <div class="card-head">
+                <div class="ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <div><h3>Fuel Receipt Template</h3><p>A pre-formatted CSV with every column the system needs. One file can hold receipts for as many fleets as you like.</p></div>
+              </div>
+              <div style="margin-top:20px; display:flex; flex-direction:column; gap:14px;">
+                <div class="note">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span>Columns: <strong>Date, Fleet, Vehicle / Plate No., Fuel Type, Odometer (km), Liters, Price per Liter (AED), Total Cost (AED), Station, Receipt No., Notes</strong>. Don't rename or reorder the headers.</span>
+                </div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                  <button class="btn btn-primary" id="btnDownloadTemplate">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download Template (.csv)
+                  </button>
+                  <button class="btn btn-ghost" id="btnDownloadSample">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    Download Sample (filled)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload -->
+            <div class="card">
+              <div class="card-head">
+                <div class="ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <div><h3>Upload Completed Receipts</h3><p>Upload your filled-in template. We'll parse each row and let you review before importing.</p></div>
+              </div>
+              <div style="margin-top:20px; display:flex; flex-direction:column; gap:14px;">
+                <div class="field">
+                  <label>Assign to fleet (optional — overrides blank rows)</label>
+                  <div class="control">
+                    <select id="uploadFleet"></select>
+                  </div>
+                </div>
+                <div class="dropzone" id="dropzone">
+                  <div class="dz-ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  </div>
+                  <div><strong>Click to browse</strong> or drag &amp; drop your file</div>
+                  <div class="hint">Accepted: .csv (exported from the template) · max 5 MB</div>
+                  <input type="file" id="fileInput" accept=".csv,text/csv" hidden />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================== HISTORY TAB =================== -->
+        <section class="panel" id="panel-history">
+          <div class="grid-4" style="margin-bottom:24px;">
+            <div class="stat">
+              <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg> Total Fuel Spend</div>
+              <div class="value" id="statSpend">—</div>
+            </div>
+            <div class="stat">
+              <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg> Total Volume</div>
+              <div class="value" id="statLiters">—</div>
+            </div>
+            <div class="stat">
+              <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Receipts</div>
+              <div class="value" id="statCount">—</div>
+            </div>
+            <div class="stat">
+              <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Avg Price / Liter</div>
+              <div class="value" id="statAvg">—</div>
+            </div>
+          </div>
+
+          <div class="filters">
+            <div class="field grow">
+              <label>Search</label>
+              <div class="control">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#98a2b3" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input id="histSearch" placeholder="Receipt no., plate, station…" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Fleet</label>
+              <div class="control"><select id="histFleet"></select></div>
+            </div>
+            <div class="field">
+              <label>Fuel Type</label>
+              <div class="control">
+                <select id="histFuel"><option value="">All</option><option>Petrol</option><option>Diesel</option></select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Status</label>
+              <div class="control">
+                <select id="histStatus"><option value="">All</option><option>Approved</option><option>Pending</option><option>Rejected</option></select>
+              </div>
+            </div>
+            <button class="btn btn-ghost" id="btnExport">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Receipt No.</th>
+                  <th>Fleet / Vehicle</th>
+                  <th>Fuel</th>
+                  <th class="num-cell">Liters</th>
+                  <th class="num-cell">Price / L</th>
+                  <th class="num-cell">Total</th>
+                  <th>Station</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="histBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- =================== CALCULATOR TAB =================== -->
+        <section class="panel" id="panel-calculator">
+          <div class="card">
+            <div class="card-head">
+              <div class="ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="9" y2="11"/><line x1="12" y1="11" x2="13" y2="11"/><line x1="8" y1="15" x2="9" y2="15"/><line x1="16" y1="11" x2="16" y2="18"/></svg>
+              </div>
+              <div><h3>Fuel Cost Calculator</h3><p>Estimate fuel consumption and cost for one or more fleets. Prices default from your <a href="#" id="goPrices" style="color:var(--primary);font-weight:600;">Fuel Prices</a> settings and can be overridden per row.</p></div>
+            </div>
+
+            <div class="table-wrap calc-table" style="margin-top:20px;">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:22%">Fleet / Vehicle</th>
+                    <th style="width:13%">Fuel Type</th>
+                    <th style="width:14%">Distance (km)</th>
+                    <th style="width:15%">Consumption (L/100km)</th>
+                    <th style="width:13%">Price / L (AED)</th>
+                    <th class="num-cell" style="width:10%">Fuel (L)</th>
+                    <th class="num-cell" style="width:13%">Cost (AED)</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="calcBody"></tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="5">Total — <span id="calcFleetCount">0</span> fleets / vehicles</td>
+                    <td class="num-cell" id="calcTotalLiters">0.00</td>
+                    <td class="num-cell" id="calcTotalCost">AED 0.00</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <div style="margin-top:16px;">
+              <button class="btn btn-ghost btn-sm" id="btnAddCalcRow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add fleet / vehicle
+              </button>
+            </div>
+
+            <div class="result-grid">
+              <div class="result"><div class="lbl">Total Distance</div><div class="val" id="resDistance">0 km</div></div>
+              <div class="result"><div class="lbl">Total Fuel Required</div><div class="val" id="resFuel">0.00 L</div></div>
+              <div class="result primary"><div class="lbl">Estimated Total Cost</div><div class="val" id="resCost">AED 0.00</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================== PRICES TAB =================== -->
+        <section class="panel" id="panel-prices">
+          <div class="card">
+            <div class="card-head">
+              <div class="ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 22V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v18"/><path d="M2 22h13"/><path d="M5.5 8h5"/><path d="M14 9l3.5 3.5V18a2 2 0 0 0 4 0v-7L18 7.5"/></svg>
+              </div>
+              <div><h3>Fuel Prices</h3><p>Used as the default unit cost across fuel analytics, receipt validation and the cost calculator.</p></div>
+            </div>
+            <div class="grid-2" style="margin-top:20px;">
+              <div class="field">
+                <label>Petrol Cost / Liter</label>
+                <div class="control">
+                  <input type="number" step="0.01" id="pricePetrol" value="2.73" />
+                  <span class="suffix">AED</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Diesel Cost / Liter</label>
+                <div class="control">
+                  <input type="number" step="0.01" id="priceDiesel" value="2.77" />
+                  <span class="suffix">AED</span>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:20px; display:flex; align-items:center; gap:16px;">
+              <button class="btn btn-primary" id="btnSavePrices">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                Save Prices
+              </button>
+              <span class="sub" id="pricesUpdated" style="color:var(--n400); font-size:13px;"></span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toasts -->
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal"></div>
+  </div>
+
+  <script>
+  (function () {
+    "use strict";
+
+    /* ---------------- Icons (Lucide-style) ---------------- */
+    const I = {
+      building:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/>',
+      truck:'<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+      users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+      settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+      user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+      pie:'<path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>',
+      globe:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+      activity:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+      pin:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+      map:'<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>',
+      route:'<circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>',
+      megaphone:'<path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+      file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+      sim:'<path d="M19 21H5a2 2 0 0 1-2-2V8l5-5h9a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2z"/><rect x="8" y="12" width="8" height="6" rx="1"/>',
+      tag:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+      check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+      chart:'<path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-4 5 4"/>',
+      list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+      grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+      alert:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+      box:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+      sliders:'<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+      palette:'<circle cx="12" cy="12" r="10"/><circle cx="8.5" cy="8.5" r="1"/><circle cx="15.5" cy="8.5" r="1"/><circle cx="8.5" cy="15.5" r="1"/><circle cx="15.5" cy="15.5" r="1"/>',
+      bell:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+      banknote:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>',
+      fuel:'<path d="M3 22V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v18"/><path d="M2 22h13"/><path d="M5.5 8h5"/><path d="M14 9l3.5 3.5V18a2 2 0 0 0 4 0v-7L18 7.5"/>',
+      droplet:'<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+      chevron:'<polyline points="9 18 15 12 9 6"/>'
+    };
+    function svg(name, cls) {
+      return '<svg class="'+(cls||'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+I[name]+'</svg>';
+    }
+
+    /* ---------------- Data ---------------- */
+    const FLEETS = ['North Region Fleet','South Region Fleet','Central Logistics','Airport Shuttle Fleet'];
+    let PRICES = { Petrol: 2.73, Diesel: 2.77 };
+    const CCY = 'AED';
+
+    let HISTORY = [
+      { date:'2026-06-09', receiptNo:'RC-2026-0457', fleet:'North Region Fleet', vehicle:'DXB-A-12345', fuel:'Diesel', odo:84210, liters:120.5, price:2.77, total:333.79, station:'ENOC Al Quoz', status:'Approved', notes:'Monthly top-up' },
+      { date:'2026-06-10', receiptNo:'RC-2026-0461', fleet:'South Region Fleet', vehicle:'DXB-K-55821', fuel:'Petrol', odo:41980, liters:48.2, price:2.73, total:131.59, station:'ADNOC Musaffah', status:'Pending', notes:'' },
+      { date:'2026-06-05', receiptNo:'RC-2026-0448', fleet:'Central Logistics', vehicle:'SHJ-B-90233', fuel:'Diesel', odo:152340, liters:210.0, price:2.77, total:581.70, station:'EPPCO Sharjah', status:'Approved', notes:'Long-haul return trip' },
+      { date:'2026-06-11', receiptNo:'RC-2026-0470', fleet:'Airport Shuttle Fleet', vehicle:'AUH-C-30188', fuel:'Petrol', odo:22110, liters:60.0, price:2.73, total:163.80, station:'ADNOC Airport Rd', status:'Rejected', notes:'Receipt image unreadable' },
+      { date:'2026-06-07', receiptNo:'RC-2026-0452', fleet:'North Region Fleet', vehicle:'DXB-A-12346', fuel:'Diesel', odo:77640, liters:95.3, price:2.77, total:264.08, station:'ENOC Al Quoz', status:'Approved', notes:'' },
+      { date:'2026-06-10', receiptNo:'RC-2026-0466', fleet:'Central Logistics', vehicle:'SHJ-B-90240', fuel:'Diesel', odo:99870, liters:180.7, price:2.77, total:500.54, station:'EPPCO Sharjah', status:'Pending', notes:'Awaiting odometer confirmation' }
+    ];
+
+    const TEMPLATE_HEADERS = ['Date','Fleet','Vehicle / Plate No.','Fuel Type','Odometer (km)','Liters','Price per Liter (AED)','Total Cost (AED)','Station','Receipt No.','Notes'];
+
+    /* ---------------- Helpers ---------------- */
+    const $ = (s, r) => (r||document).querySelector(s);
+    const $$ = (s, r) => Array.prototype.slice.call((r||document).querySelectorAll(s));
+    const fmtMoney = n => CCY + ' ' + Number(n).toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtNum = (n, d) => Number(n).toLocaleString('en-AE', { minimumFractionDigits: d||0, maximumFractionDigits: d===undefined?2:d });
+    const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+    function download(filename, text, mime) {
+      const blob = new Blob([text], { type: (mime||'text/csv') + ';charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    }
+    function csvCell(v) {
+      v = v == null ? '' : String(v);
+      return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+    }
+    function toCSV(rows) { return rows.map(r => r.map(csvCell).join(',')).join('\r\n'); }
+    function parseCSV(text) {
+      const rows = []; let row = [], cell = '', q = false;
+      text = text.replace(/^﻿/, '');
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (q) {
+          if (c === '"') { if (text[i+1] === '"') { cell += '"'; i++; } else q = false; }
+          else cell += c;
+        } else if (c === '"') q = true;
+        else if (c === ',') { row.push(cell); cell = ''; }
+        else if (c === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
+        else if (c === '\r') { /* skip */ }
+        else cell += c;
+      }
+      if (cell.length || row.length) { row.push(cell); rows.push(row); }
+      return rows.filter(r => r.some(c => String(c).trim() !== ''));
+    }
+
+    /* ---------------- Toasts ---------------- */
+    function toast(title, msg, kind) {
+      const el = document.createElement('div');
+      el.className = 'toast' + (kind === 'error' ? ' error' : '');
+      const ic = kind === 'error'
+        ? '<polyline points="15 9 9 15"/><polyline points="9 9 15 15"/><circle cx="12" cy="12" r="10"/>'
+        : '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>';
+      el.innerHTML = '<span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+ic+'</svg></span>'+
+                     '<div><div class="t-title">'+esc(title)+'</div>'+(msg?'<div class="t-msg">'+esc(msg)+'</div>':'')+'</div>';
+      $('#toastWrap').appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(()=>el.remove(), 300); }, 3800);
+    }
+
+    /* ---------------- Modal ---------------- */
+    const overlay = $('#modalOverlay'), modal = $('#modal');
+    function openModal(html) { modal.innerHTML = html; overlay.classList.add('open'); }
+    function closeModal() { overlay.classList.remove('open'); modal.innerHTML = ''; }
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    /* ---------------- Build rails & nav ---------------- */
+    function buildChrome() {
+      $('#railPrimary').innerHTML =
+        '<div><div class="logo">F</div>'+
+        '<div class="grp">'+
+          '<div class="rail-icon active" title="Assets">'+svg('building')+'</div>'+
+          '<div class="rail-icon" title="Fleet">'+svg('truck')+'</div>'+
+          '<div class="rail-icon" title="Users">'+svg('users')+'</div>'+
+        '</div></div>'+
+        '<div class="grp">'+
+          '<div class="rail-icon" title="Settings">'+svg('settings')+'</div>'+
+          '<div class="rail-avatar">'+svg('user')+'</div>'+
+        '</div>';
+
+      const mods = ['pie','globe','truck','activity','users','pin','map','route','megaphone','file','sim'];
+      $('#railModules').innerHTML = mods.map((m,i) =>
+        '<div class="mod-icon'+(i===3?' active':'')+'">'+svg(m)+'</div>').join('');
+
+      const items1 = [
+        ['tag','Tags & Categories'],['check','Roles Management'],['chart','Application Management'],
+        ['list','Task Type Management'],['grid','Pipeline Configuration'],['alert','Event Configuration'],
+        ['bell','Module Management'],['box','Entity Configuration'],['sliders','Preferences'],
+        ['palette','Appearance'],['bell','Subscriptions'],['banknote','Billing & License']
+      ];
+      const items2 = [['user','User Accounts'],['settings','Organization Settings'],['building','Sub-Organization']];
+      const navItem = (ic,label,active) => '<a class="nav-item'+(active?' active':'')+'">'+svg(ic)+'<span>'+label+'</span></a>';
+
+      $('#sectionNav').innerHTML =
+        '<div class="go-back">'+svg('chevron')+'<span>Go Back</span></div>'+
+        '<div class="nav-title"><span class="ico">'+svg('settings')+'</span><h1>Settings</h1></div>'+
+        '<div class="nav-group">'+
+          items1.map(it => navItem(it[0], it[1], false)).join('')+
+          navItem('fuel','Fuel Management', true)+
+        '</div>'+
+        '<div class="nav-group"><div class="heading">Organization Settings</div>'+
+          items2.map(it => navItem(it[0], it[1], false)).join('')+
+        '</div>';
+    }
+
+    /* ---------------- Tabs ---------------- */
+    function activateTab(name) {
+      $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+      $$('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+    }
+    $('#tabs').addEventListener('click', e => {
+      const t = e.target.closest('.tab'); if (t) activateTab(t.dataset.tab);
+    });
+    $('#goPrices').addEventListener('click', e => { e.preventDefault(); activateTab('prices'); });
+
+    /* ---------------- Fleet selects ---------------- */
+    function fillFleetSelects() {
+      const optBlank = '<option value="">Keep value from file</option>';
+      $('#uploadFleet').innerHTML = optBlank + FLEETS.map(f => '<option>'+esc(f)+'</option>').join('');
+      $('#histFleet').innerHTML = '<option value="">All fleets</option>' + FLEETS.map(f => '<option>'+esc(f)+'</option>').join('');
+    }
+
+    /* ---------------- Download template / sample ---------------- */
+    $('#btnDownloadTemplate').addEventListener('click', () => {
+      download('fuel-receipt-template.csv', toCSV([TEMPLATE_HEADERS]));
+      toast('Template downloaded', 'Fill in one row per receipt, then upload it back here.');
+    });
+    $('#btnDownloadSample').addEventListener('click', () => {
+      const rows = [TEMPLATE_HEADERS,
+        ['2026-06-12','North Region Fleet','DXB-A-12345','Diesel','84580','118.4','2.77','327.97','ENOC Al Quoz','RC-2026-0480','Sample row — replace with your data'],
+        ['2026-06-12','South Region Fleet','DXB-K-55821','Petrol','42230','45.0','2.73','122.85','ADNOC Musaffah','RC-2026-0481','']
+      ];
+      download('fuel-receipt-sample.csv', toCSV(rows));
+      toast('Sample downloaded', 'A filled example so you can see the expected format.');
+    });
+
+    /* ---------------- Upload flow ---------------- */
+    const dropzone = $('#dropzone'), fileInput = $('#fileInput');
+    dropzone.addEventListener('click', () => fileInput.click());
+    ['dragenter','dragover'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
+    ['dragleave','drop'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
+    dropzone.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+    fileInput.addEventListener('change', e => { const f = e.target.files[0]; if (f) handleFile(f); fileInput.value = ''; });
+
+    function colIndex(headers, label) {
+      const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g,'');
+      const target = norm(label);
+      return headers.findIndex(h => norm(h) === target || norm(h).indexOf(norm(label.split('(')[0])) === 0 && norm(label.split('(')[0]).length>2);
+    }
+
+    function handleFile(file) {
+      if (!/\.csv$/i.test(file.name)) { toast('Unsupported file', 'Please upload the .csv template.', 'error'); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        try { previewImport(parseCSV(reader.result), file.name); }
+        catch (err) { toast('Could not read file', 'The file does not look like the template.', 'error'); }
+      };
+      reader.onerror = () => toast('Read error', 'Could not read that file.', 'error');
+      reader.readAsText(file);
+    }
+
+    function previewImport(rows, filename) {
+      if (rows.length < 2) { toast('Empty file', 'No receipt rows were found.', 'error'); return; }
+      const headers = rows[0];
+      const idx = {
+        date: colIndex(headers,'Date'), fleet: colIndex(headers,'Fleet'), vehicle: colIndex(headers,'Vehicle / Plate No.'),
+        fuel: colIndex(headers,'Fuel Type'), odo: colIndex(headers,'Odometer (km)'), liters: colIndex(headers,'Liters'),
+        price: colIndex(headers,'Price per Liter (AED)'), total: colIndex(headers,'Total Cost (AED)'),
+        station: colIndex(headers,'Station'), receiptNo: colIndex(headers,'Receipt No.'), notes: colIndex(headers,'Notes')
+      };
+      if (idx.liters < 0 || idx.fuel < 0) {
+        toast('Wrong format', 'Required columns are missing. Use the downloaded template.', 'error'); return;
+      }
+      const forceFleet = $('#uploadFleet').value;
+      const parsed = rows.slice(1).map(r => {
+        const liters = parseFloat(r[idx.liters]) || 0;
+        let price = parseFloat(r[idx.price]) || 0;
+        const fuel = (r[idx.fuel]||'').trim() || 'Diesel';
+        if (!price) price = PRICES[fuel] || PRICES.Diesel;
+        let total = parseFloat(r[idx.total]) || 0;
+        if (!total) total = +(liters * price).toFixed(2);
+        return {
+          date: (r[idx.date]||'').trim(), fleet: forceFleet || (r[idx.fleet]||'').trim() || 'Unassigned',
+          vehicle: (r[idx.vehicle]||'').trim(), fuel: fuel, odo: parseFloat(r[idx.odo])||0,
+          liters: liters, price: price, total: total, station: (r[idx.station]||'').trim(),
+          receiptNo: (r[idx.receiptNo]||'').trim() || ('RC-IMP-'+Math.floor(Math.random()*9000+1000)),
+          notes: idx.notes>=0 ? (r[idx.notes]||'').trim() : '', status: 'Pending'
+        };
+      });
+      const fleets = Array.from(new Set(parsed.map(p => p.fleet)));
+      const sumTotal = parsed.reduce((a,p)=>a+p.total,0);
+
+      const rowsHtml = parsed.map(p =>
+        '<tr><td>'+esc(p.date)+'</td><td class="strong">'+esc(p.receiptNo)+'</td>'+
+        '<td>'+esc(p.fleet)+'<div class="sub">'+esc(p.vehicle)+'</div></td>'+
+        '<td><span class="chip">'+esc(p.fuel)+'</span></td>'+
+        '<td class="num-cell">'+fmtNum(p.liters,1)+'</td>'+
+        '<td class="num-cell">'+fmtNum(p.price,2)+'</td>'+
+        '<td class="num-cell strong">'+fmtMoney(p.total)+'</td>'+
+        '<td>'+esc(p.station)+'</td></tr>').join('');
+
+      openModal(
+        '<div class="modal-head"><div><h3>Review import</h3><p>'+esc(filename)+'</p></div>'+
+          '<button class="close-x" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>'+
+        '<div class="modal-body">'+
+          '<div class="note" style="margin-bottom:16px;">'+svg('check')+
+            '<span><strong>'+parsed.length+' receipt'+(parsed.length>1?'s':'')+'</strong> across <strong>'+fleets.length+' fleet'+(fleets.length>1?'s':'')+'</strong> · total '+fmtMoney(sumTotal)+
+            '. Rows will be imported with status <strong>Pending</strong> for review.</span></div>'+
+          '<div class="table-wrap"><table><thead><tr><th>Date</th><th>Receipt No.</th><th>Fleet / Vehicle</th><th>Fuel</th><th class="num-cell">Liters</th><th class="num-cell">Price / L</th><th class="num-cell">Total</th><th>Station</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
+        '</div>'+
+        '<div class="modal-foot"><button class="btn btn-ghost" data-close>Cancel</button>'+
+          '<button class="btn btn-primary" id="confirmImport">'+
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'+
+          'Import '+parsed.length+' receipt'+(parsed.length>1?'s':'')+'</button></div>'
+      );
+      $$('[data-close]', modal).forEach(b => b.addEventListener('click', closeModal));
+      $('#confirmImport', modal).addEventListener('click', () => {
+        HISTORY = parsed.concat(HISTORY);
+        closeModal();
+        renderHistory();
+        activateTab('history');
+        toast('Receipts imported', parsed.length+' receipt'+(parsed.length>1?'s':'')+' added across '+fleets.length+' fleet'+(fleets.length>1?'s':'')+'.');
+      });
+    }
+
+    /* ---------------- History ---------------- */
+    function filteredHistory() {
+      const q = ($('#histSearch').value||'').toLowerCase().trim();
+      const fl = $('#histFleet').value, fu = $('#histFuel').value, st = $('#histStatus').value;
+      return HISTORY.filter(r => {
+        if (fl && r.fleet !== fl) return false;
+        if (fu && r.fuel !== fu) return false;
+        if (st && r.status !== st) return false;
+        if (q && !((r.receiptNo+' '+r.vehicle+' '+r.station+' '+r.fleet).toLowerCase().includes(q))) return false;
+        return true;
+      });
+    }
+    function renderHistory() {
+      const data = filteredHistory();
+      const spend = data.reduce((a,r)=>a+r.total,0);
+      const liters = data.reduce((a,r)=>a+r.liters,0);
+      $('#statSpend').textContent = fmtMoney(spend);
+      $('#statLiters').innerHTML = fmtNum(liters,1) + ' <small>L</small>';
+      $('#statCount').textContent = data.length;
+      $('#statAvg').textContent = liters ? fmtMoney(spend/liters) : (CCY+' 0.00');
+
+      const pending = HISTORY.filter(r => r.status === 'Pending').length;
+      const pill = $('#pendingPill');
+      if (pending) { pill.style.display = ''; pill.textContent = pending + ' pending'; } else pill.style.display = 'none';
+
+      if (!data.length) {
+        $('#histBody').innerHTML = '<tr><td colspan="10"><div class="empty">'+svg('file')+'<div>No receipts match your filters.</div></div></td></tr>';
+        return;
+      }
+      $('#histBody').innerHTML = data.map((r, i) => {
+        const cls = r.status === 'Approved' ? 'approved' : r.status === 'Rejected' ? 'rejected' : 'pending';
+        return '<tr>'+
+          '<td>'+esc(r.date)+'</td>'+
+          '<td class="strong">'+esc(r.receiptNo)+'</td>'+
+          '<td><div class="strong">'+esc(r.fleet)+'</div><div class="sub">'+esc(r.vehicle||'—')+'</div></td>'+
+          '<td><span class="chip">'+esc(r.fuel)+'</span></td>'+
+          '<td class="num-cell">'+fmtNum(r.liters,1)+'</td>'+
+          '<td class="num-cell">'+fmtNum(r.price,2)+'</td>'+
+          '<td class="num-cell strong">'+fmtMoney(r.total)+'</td>'+
+          '<td>'+esc(r.station||'—')+'</td>'+
+          '<td><span class="badge '+cls+'">'+esc(r.status)+'</span></td>'+
+          '<td><div class="row-actions">'+
+            '<button class="icon-btn" data-view="'+i+'" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>'+
+          '</div></td>'+
+        '</tr>';
+      }).join('');
+
+      $$('#histBody [data-view]').forEach(b => b.addEventListener('click', () => viewReceipt(data[+b.dataset.view])));
+    }
+    function viewReceipt(r) {
+      const cls = r.status === 'Approved' ? 'approved' : r.status === 'Rejected' ? 'rejected' : 'pending';
+      const di = (k,v) => '<div class="di"><div class="k">'+k+'</div><div class="v">'+esc(v)+'</div></div>';
+      openModal(
+        '<div class="modal-head"><div><h3>'+esc(r.receiptNo)+' <span class="badge '+cls+'" style="vertical-align:middle;margin-left:8px;">'+esc(r.status)+'</span></h3><p>'+esc(r.fleet)+' · '+esc(r.vehicle||'—')+'</p></div>'+
+          '<button class="close-x" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>'+
+        '<div class="modal-body"><div class="detail-grid">'+
+          di('Date', r.date)+di('Station', r.station||'—')+
+          di('Fuel Type', r.fuel)+di('Odometer', fmtNum(r.odo,0)+' km')+
+          di('Volume', fmtNum(r.liters,2)+' L')+di('Price / Liter', fmtMoney(r.price))+
+          di('Total Cost', fmtMoney(r.total))+di('Fleet', r.fleet)+
+        '</div>'+(r.notes ? '<div class="note" style="margin-top:18px;">'+svg('alert')+'<span>'+esc(r.notes)+'</span></div>' : '')+'</div>'+
+        '<div class="modal-foot"><button class="btn btn-ghost" data-close>Close</button></div>'
+      );
+      $$('[data-close]', modal).forEach(b => b.addEventListener('click', closeModal));
+    }
+    ['histSearch','histFleet','histFuel','histStatus'].forEach(id => {
+      $('#'+id).addEventListener('input', renderHistory);
+      $('#'+id).addEventListener('change', renderHistory);
+    });
+    $('#btnExport').addEventListener('click', () => {
+      const data = filteredHistory();
+      if (!data.length) { toast('Nothing to export', 'No receipts match your filters.', 'error'); return; }
+      const rows = [TEMPLATE_HEADERS].concat(data.map(r =>
+        [r.date, r.fleet, r.vehicle, r.fuel, r.odo, r.liters, r.price, r.total, r.station, r.receiptNo, r.notes]));
+      download('fuel-receipts-export.csv', toCSV(rows));
+      toast('Exported', data.length + ' receipt'+(data.length>1?'s':'')+' exported to CSV.');
+    });
+
+    /* ---------------- Calculator ---------------- */
+    const calcBody = $('#calcBody');
+    function calcRow(fleet, fuel, dist, cons) {
+      const tr = document.createElement('tr');
+      tr.className = 'calc-row';
+      tr.innerHTML =
+        '<td><select class="c-fleet"><option value="">— select —</option>'+FLEETS.map(f=>'<option'+(f===fleet?' selected':'')+'>'+esc(f)+'</option>').join('')+'</select></td>'+
+        '<td><select class="c-fuel"><option'+(fuel==='Petrol'?' selected':'')+'>Petrol</option><option'+(fuel==='Diesel'?' selected':'')+'>Diesel</option></select></td>'+
+        '<td><input class="c-dist" type="number" min="0" step="1" value="'+(dist||'')+'" placeholder="0"></td>'+
+        '<td><input class="c-cons" type="number" min="0" step="0.1" value="'+(cons||'')+'" placeholder="0"></td>'+
+        '<td><input class="c-price" type="number" min="0" step="0.01" value="'+(PRICES[fuel]||PRICES.Diesel)+'"></td>'+
+        '<td class="num-cell calc-out c-liters">0.00</td>'+
+        '<td class="num-cell calc-out c-cost">'+CCY+' 0.00</td>'+
+        '<td><button class="icon-btn c-del" title="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>';
+      calcBody.appendChild(tr);
+
+      const fuelSel = $('.c-fuel', tr), priceIn = $('.c-price', tr);
+      fuelSel.addEventListener('change', () => { priceIn.value = PRICES[fuelSel.value] || PRICES.Diesel; recalc(); });
+      $$('input,select', tr).forEach(inp => inp.addEventListener('input', recalc));
+      $('.c-del', tr).addEventListener('click', () => {
+        if (calcBody.children.length > 1) { tr.remove(); recalc(); }
+        else toast('At least one row', 'Keep one row in the calculator.', 'error');
+      });
+      return tr;
+    }
+    function recalc() {
+      let totL = 0, totC = 0, totD = 0;
+      $$('.calc-row', calcBody).forEach(tr => {
+        const dist = parseFloat($('.c-dist', tr).value) || 0;
+        const cons = parseFloat($('.c-cons', tr).value) || 0;
+        const price = parseFloat($('.c-price', tr).value) || 0;
+        const liters = dist/100 * cons;
+        const cost = liters * price;
+        $('.c-liters', tr).textContent = fmtNum(liters,2);
+        $('.c-cost', tr).textContent = fmtMoney(cost);
+        totL += liters; totC += cost; totD += dist;
+      });
+      $('#calcFleetCount').textContent = calcBody.children.length;
+      $('#calcTotalLiters').textContent = fmtNum(totL,2);
+      $('#calcTotalCost').textContent = fmtMoney(totC);
+      $('#resDistance').textContent = fmtNum(totD,0) + ' km';
+      $('#resFuel').textContent = fmtNum(totL,2) + ' L';
+      $('#resCost').textContent = fmtMoney(totC);
+    }
+    $('#btnAddCalcRow').addEventListener('click', () => { calcRow('','Diesel','',''); recalc(); });
+
+    /* ---------------- Prices ---------------- */
+    function stamp() {
+      const d = new Date();
+      $('#pricesUpdated').textContent = 'Last updated ' + d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    }
+    $('#btnSavePrices').addEventListener('click', () => {
+      const p = parseFloat($('#pricePetrol').value), d = parseFloat($('#priceDiesel').value);
+      if (!(p > 0) || !(d > 0)) { toast('Invalid price', 'Enter valid petrol and diesel prices.', 'error'); return; }
+      PRICES.Petrol = +p.toFixed(2); PRICES.Diesel = +d.toFixed(2);
+      // refresh any calculator rows that still hold the old default
+      $$('.calc-row', calcBody).forEach(tr => { $('.c-price', tr).value = PRICES[$('.c-fuel', tr).value] || PRICES.Diesel; });
+      recalc(); stamp();
+      toast('Fuel prices saved', 'Petrol '+fmtMoney(PRICES.Petrol)+' · Diesel '+fmtMoney(PRICES.Diesel)+' per liter.');
+    });
+
+    /* ---------------- Init ---------------- */
+    buildChrome();
+    fillFleetSelects();
+    renderHistory();
+    calcRow('North Region Fleet','Diesel', 320, 28);
+    calcRow('South Region Fleet','Petrol', 180, 9.5);
+    recalc();
+    stamp();
+  })();
+  </script>
+</body>
+</html>
