@@ -347,10 +347,6 @@
             Fuel History
             <span class="pill" id="pendingPill" style="display:none"></span>
           </button>
-          <button class="tab" data-tab="upload">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Import Receipts
-          </button>
           <button class="tab" data-tab="prices">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>
             Fuel Prices
@@ -405,10 +401,16 @@
                 <button class="active" data-view="receipts">Receipts</button>
                 <button data-view="vehicles">By Vehicle</button>
               </div>
-              <button class="btn btn-ghost btn-sm" id="btnExport">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Export
-              </button>
+              <div style="display:flex; gap:12px;">
+                <button class="btn btn-ghost btn-sm" id="btnExport">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export
+                </button>
+                <button class="btn btn-primary btn-sm" id="btnImport">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  Import Receipts
+                </button>
+              </div>
             </div>
 
             <div class="filters">
@@ -474,46 +476,6 @@
                 </thead>
                 <tbody id="vehBody"></tbody>
               </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- =================== IMPORT TAB =================== -->
-        <section class="panel" id="panel-upload">
-          <div class="card">
-            <!-- Need a template? -->
-            <div class="need-template">
-              <div class="nt-left">
-                <div class="nt-ico">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                </div>
-                <div>
-                  <div class="nt-title">Need a template?</div>
-                  <div class="nt-sub">Download the CSV template — fill in vehicle, date and litres, then upload it back. One file covers your whole fleet.</div>
-                </div>
-              </div>
-              <button class="btn btn-outline" id="btnDownloadTemplate">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Download Template
-              </button>
-            </div>
-
-            <div class="divider"></div>
-
-            <!-- Upload File -->
-            <p class="ub-label">Upload File</p>
-            <div class="field ub-fleet">
-              <label>Assign to fleet (optional — fills blank rows)</label>
-              <div class="control"><select id="uploadFleet"></select></div>
-            </div>
-            <div class="dropzone" id="dropzone">
-              <div class="upload-art" id="uploadArt"></div>
-              <div class="dz-text">Drop files to attach or <span class="browse">browse</span></div>
-              <div class="hint">Accepted format: .csv · max 5 MB · supports multiple fleets in one file</div>
-              <input type="file" id="fileInput" accept=".csv,text/csv" hidden />
-            </div>
-            <div style="margin-top:14px;">
-              <button class="link" id="btnDownloadSample">Download a filled sample instead</button>
             </div>
           </div>
         </section>
@@ -762,7 +724,6 @@
 
     /* ---------------- Fleet selects ---------------- */
     function fillFleetSelects() {
-      $('#uploadFleet').innerHTML = '<option value="">Keep value from file</option>' + FLEETS.map(f => '<option>'+esc(f)+'</option>').join('');
       $('#histFleet').innerHTML = '<option value="">All fleets</option>' + FLEETS.map(f => '<option>'+esc(f)+'</option>').join('');
     }
 
@@ -783,16 +744,36 @@
       renderHistory();
       toast('Sample data loaded', SAMPLE_DATA.length + ' example receipts added across ' + new Set(SAMPLE_DATA.map(r=>r.fleet)).size + ' fleets.');
     }
-    $('#btnDownloadTemplate').addEventListener('click', downloadTemplate);
-    $('#btnDownloadSample').addEventListener('click', downloadSample);
-
-    /* ---------------- Upload flow ---------------- */
-    const dropzone = $('#dropzone'), fileInput = $('#fileInput');
-    dropzone.addEventListener('click', () => fileInput.click());
-    ['dragenter','dragover'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
-    ['dragleave','drop'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
-    dropzone.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
-    fileInput.addEventListener('change', e => { const f = e.target.files[0]; if (f) handleFile(f); fileInput.value = ''; });
+    /* ---------------- Import modal (download template + dropzone) ---------------- */
+    const SVG_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+    function openImportModal() {
+      openModal(
+        '<div class="modal-head"><div><h3>Import Fuel Receipts</h3><p>Upload your monthly receipt export — one file can cover your whole fleet.</p></div>'+xBtn+'</div>'+
+        '<div class="modal-body">'+
+          '<div class="need-template">'+
+            '<div class="nt-left"><div class="nt-ico">'+svg('file')+'</div>'+
+              '<div><div class="nt-title">Need a template?</div><div class="nt-sub">Download the CSV template — fill in vehicle, date and litres, then upload it back.</div></div></div>'+
+            '<button class="btn btn-outline" id="mDlTemplate">'+SVG_DL+' Download Template</button>'+
+          '</div>'+
+          '<div class="divider"></div>'+
+          '<div class="field" style="margin-bottom:16px; max-width:380px;"><label>Assign to fleet (optional — fills blank rows)</label><div class="control"><select id="importFleet"></select></div></div>'+
+          '<div class="dropzone" id="dropzone"><div class="upload-art">'+ART_UPLOAD+'</div>'+
+            '<div class="dz-text">Drop files to attach or <span class="browse">browse</span></div>'+
+            '<div class="hint">Accepted format: .csv · max 5 MB · supports multiple fleets in one file</div>'+
+            '<input type="file" id="fileInput" accept=".csv,text/csv" hidden /></div>'+
+          '<div style="margin-top:14px;"><button class="link" id="mDlSample">Download a filled sample instead</button></div>'+
+        '</div>'
+      );
+      $('#importFleet', modal).innerHTML = '<option value="">Keep value from file</option>' + FLEETS.map(f => '<option>'+esc(f)+'</option>').join('');
+      const dz = $('#dropzone', modal), fi = $('#fileInput', modal);
+      dz.addEventListener('click', () => fi.click());
+      ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
+      ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
+      dz.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+      fi.addEventListener('change', e => { const f = e.target.files[0]; if (f) handleFile(f); fi.value = ''; });
+      $('#mDlTemplate', modal).addEventListener('click', downloadTemplate);
+      $('#mDlSample', modal).addEventListener('click', downloadSample);
+    }
 
     const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g,'');
     function colIndex(headers, label) {
@@ -825,7 +806,7 @@
       if (idx.liters < 0 || idx.vehicle < 0) {
         toast('Wrong format', 'Vehicle and Liters columns are required. Use the downloaded template.', 'error'); return;
       }
-      const forceFleet = $('#uploadFleet').value;
+      const forceFleet = (document.getElementById('importFleet') || {}).value || '';
       const parsed = rows.slice(1).map(r => {
         const liters = parseFloat(r[idx.liters]) || 0;
         const fuel = (idx.fuel>=0 ? (r[idx.fuel]||'') : '').trim() || 'Diesel';
@@ -1057,8 +1038,9 @@
       }
     });
 
-    // Empty-state actions
-    $('#esImport').addEventListener('click', () => activateTab('upload'));
+    // Import + empty-state actions
+    $('#esImport').addEventListener('click', openImportModal);
+    $('#btnImport').addEventListener('click', openImportModal);
     $('#esTemplate').addEventListener('click', downloadTemplate);
     $('#esSample').addEventListener('click', loadSample);
 
@@ -1079,7 +1061,6 @@
     buildChrome();
     fillFleetSelects();
     $('#emptyArt').innerHTML = ART_EMPTY;
-    $('#uploadArt').innerHTML = ART_UPLOAD;
     setHistView('receipts');
     renderHistory();          // shows empty state (HISTORY is empty)
     stamp();
