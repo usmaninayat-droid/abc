@@ -194,12 +194,15 @@
     .svc-search input { width: 100%; font-family: inherit; font-size: 14px; padding: 9px 12px 9px 36px; border: 1px solid #e3e8ee; border-radius: 9px; outline: none; }
     .svc-search input:focus { border-color: var(--brand); }
     .svc-search svg { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--muted); }
-    .svc-items { max-height: 232px; overflow-y: auto; }
-    .svc-item { padding: 12px 16px; font-size: 14.5px; color: var(--ink-2); cursor: pointer; border-bottom: 1px solid #f3f5f8; }
-    .svc-item:last-child { border-bottom: none; }
-    .svc-item:hover { background: #f5faf8; color: var(--ink); }
-    .svc-item.sel { color: var(--brand-600); font-weight: 700; background: #eef9f3; }
-    .svc-none { padding: 16px; text-align: center; color: var(--muted); font-size: 14px; }
+    .svc-items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-height: 286px; overflow-y: auto; padding: 10px; }
+    .svc-tile { display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 13px 6px; border: 1.5px solid transparent; border-radius: 14px; background: #f5f7f9; cursor: pointer; font-family: inherit; transition: background .15s ease, border-color .15s ease; }
+    .svc-tile:hover { background: #eef1f4; }
+    .svc-tile.sel { border-color: var(--brand); background: #eef9f3; }
+    .svc-ic { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; color: #fff; flex-shrink: 0; }
+    .svc-ic svg { width: 24px; height: 24px; }
+    .svc-name { font-size: 11.5px; font-weight: 600; line-height: 1.25; color: var(--ink-2); text-align: center; }
+    .svc-tile.sel .svc-name { color: var(--brand-600); }
+    .svc-none { grid-column: 1 / -1; padding: 18px; text-align: center; color: var(--muted); font-size: 14px; }
 
     /* Note */
     .note { width: 100%; min-height: 92px; resize: vertical; font-family: inherit; font-size: 15px; color: var(--ink); padding: 13px 15px; border: 1px solid #e3e8ee; border-radius: 12px; background: #f7f9fb; outline: none; }
@@ -477,17 +480,52 @@
     setFilter('active');
 
     /* ===== Report a Complaint sheet ===== */
-    // English-only service list (replaces the bilingual full-screen picker); a
-    // searchable list scales to the full 26-service catalogue.
+    // English-only, Google-Maps-style icon-tile picker; the search keeps it
+    // usable across the full 26-service catalogue.
+    const svgWrap = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+    const IC = {
+      bin: svgWrap('<path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14"/><path d="M10 11v6"/><path d="M14 11v6"/>'),
+      truck: svgWrap('<path d="M10 17h4V5H2v12h2"/><path d="M14 9h4l3 3v5h-3"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/>'),
+      leaf: svgWrap('<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>'),
+      recycle: svgWrap('<polyline points="22 5 22 10 17 10"/><polyline points="2 19 2 14 7 14"/><path d="M3.7 9a8 8 0 0 1 13.4-2.6L22 10"/><path d="M2 14l4.9 4.6A8 8 0 0 0 20.3 15"/>'),
+      droplet: svgWrap('<path d="M12 2.7S6 9 6 13.5a6 6 0 0 0 12 0C18 9 12 2.7 12 2.7Z"/>'),
+      sparkle: svgWrap('<path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9z"/><path d="M5 16l.8 2.2L8 19l-2.2.8L5 22l-.8-2.2L2 19l2.2-.8z"/>'),
+      alert: svgWrap('<path d="M10.3 3.3 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'),
+      plus: svgWrap('<rect x="3" y="3" width="18" height="18" rx="3"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>'),
+      medical: svgWrap('<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>'),
+      zap: svgWrap('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'),
+      paw: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6.5" cy="10" r="1.8"/><circle cx="10" cy="7" r="1.8"/><circle cx="14" cy="7" r="1.8"/><circle cx="17.5" cy="10" r="1.8"/><path d="M12 12c-2.8 0-4.8 2-4.8 4.2 0 1.8 1.5 2.3 4.8 2.3s4.8-.5 4.8-2.3C16.8 14 14.8 12 12 12z"/></svg>',
+      map: svgWrap('<polygon points="2 6 9 3 15 6 22 3 22 18 15 21 9 18 2 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/>'),
+      user: svgWrap('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'),
+      move: svgWrap('<polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/>'),
+    };
     const services = [
-      'Full Bin Collection', 'Household Waste Collection', 'Bulky Waste Collection',
-      'Commercial Waste Collection', 'Recyclable Waste Collection', 'Green Waste Collection',
-      'Garden Waste Collection', 'Hazardous Waste Collection', 'Medical Waste Collection',
-      'Electronic Waste Collection', 'Construction Waste Removal', 'Residential Waste Removal',
-      'Bin Washing', 'Under Bin Washing', 'Waste Container Cleaning', 'Replace / Add Waste Container',
-      'Bin Relocation Request', 'Dead Animals Collection', 'Internal Streets Cleanliness',
-      'Public Area Cleaning', 'Illegal Dumping Report', 'Overflowing Bin', 'Missed Collection',
-      'Damaged Bin', 'Report Wrong Practices', 'Staff Complaint'
+      { name: 'Full Bin Collection', icon: IC.bin, color: '#16a34a' },
+      { name: 'Household Waste Collection', icon: IC.bin, color: '#0d9488' },
+      { name: 'Bulky Waste Collection', icon: IC.truck, color: '#2563eb' },
+      { name: 'Commercial Waste Collection', icon: IC.truck, color: '#4f46e5' },
+      { name: 'Recyclable Waste Collection', icon: IC.recycle, color: '#65a30d' },
+      { name: 'Green Waste Collection', icon: IC.leaf, color: '#16a34a' },
+      { name: 'Garden Waste Collection', icon: IC.leaf, color: '#65a30d' },
+      { name: 'Hazardous Waste Collection', icon: IC.alert, color: '#dc2626' },
+      { name: 'Medical Waste Collection', icon: IC.medical, color: '#e11d48' },
+      { name: 'Electronic Waste Collection', icon: IC.zap, color: '#7c3aed' },
+      { name: 'Construction Waste Removal', icon: IC.truck, color: '#d97706' },
+      { name: 'Residential Waste Removal', icon: IC.truck, color: '#0d9488' },
+      { name: 'Bin Washing', icon: IC.droplet, color: '#0891b2' },
+      { name: 'Under Bin Washing', icon: IC.droplet, color: '#0284c7' },
+      { name: 'Waste Container Cleaning', icon: IC.sparkle, color: '#0891b2' },
+      { name: 'Replace / Add Waste Container', icon: IC.plus, color: '#4f46e5' },
+      { name: 'Bin Relocation Request', icon: IC.move, color: '#475569' },
+      { name: 'Dead Animals Collection', icon: IC.paw, color: '#92400e' },
+      { name: 'Internal Streets Cleanliness', icon: IC.map, color: '#d97706' },
+      { name: 'Public Area Cleaning', icon: IC.sparkle, color: '#ea8a00' },
+      { name: 'Illegal Dumping Report', icon: IC.alert, color: '#ea580c' },
+      { name: 'Overflowing Bin', icon: IC.bin, color: '#dc2626' },
+      { name: 'Missed Collection', icon: IC.truck, color: '#dc2626' },
+      { name: 'Damaged Bin', icon: IC.bin, color: '#475569' },
+      { name: 'Report Wrong Practices', icon: IC.alert, color: '#475569' },
+      { name: 'Staff Complaint', icon: IC.user, color: '#475569' },
     ];
 
     const sheet = document.getElementById('sheet');
@@ -620,9 +658,9 @@
     }
 
     function renderServices(q = '') {
-      const f = services.filter(s => s.toLowerCase().includes(q.toLowerCase()));
+      const f = services.filter(s => s.name.toLowerCase().includes(q.toLowerCase()));
       svcItems.innerHTML = f.length
-        ? f.map(s => `<div class="svc-item${s === chosenService ? ' sel' : ''}">${s}</div>`).join('')
+        ? f.map(s => `<button type="button" class="svc-tile${s.name === chosenService ? ' sel' : ''}" data-name="${s.name}"><span class="svc-ic" style="background:${s.color}">${s.icon}</span><span class="svc-name">${s.name}</span></button>`).join('')
         : '<div class="svc-none">No service found</div>';
     }
     renderServices();
@@ -633,9 +671,9 @@
     });
     svcSearch.addEventListener('input', e => renderServices(e.target.value));
     svcItems.addEventListener('click', e => {
-      const it = e.target.closest('.svc-item');
+      const it = e.target.closest('.svc-tile');
       if (!it) return;
-      chosenService = it.textContent;
+      chosenService = it.dataset.name;
       selVal.textContent = chosenService;
       selVal.classList.remove('ph');
       select.classList.remove('open');
