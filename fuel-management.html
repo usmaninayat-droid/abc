@@ -277,24 +277,6 @@
     .empty { text-align: center; padding: 48px 20px; color: var(--n400); }
     .empty svg { width: 40px; height: 40px; margin-bottom: 10px; color: var(--n300); }
 
-    /* ---------- Calculator ---------- */
-    .calc-table td { padding: 8px 10px; }
-    .calc-table input, .calc-table select {
-      border: 1px solid var(--n300); border-radius: var(--radius); padding: 8px 10px; font-weight: 500; width: 100%; outline: none;
-    }
-    .calc-table input:focus, .calc-table select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,114,214,.12); }
-    .calc-out { font-weight: 700; color: var(--n900); }
-    tfoot td { background: var(--primary-light); font-weight: 700; color: var(--n900); padding: 13px 16px; border-top: 1px solid var(--primary-200); }
-
-    .result-grid { display:grid; grid-template-columns: repeat(3,1fr); gap:16px; margin-top: 20px; }
-    @media (max-width: 1100px){ .result-grid { grid-template-columns: 1fr; } }
-    .result { background: var(--n-lightest); border:1px solid var(--n200); border-radius: var(--radius); padding:16px 18px; }
-    .result .lbl { color: var(--n400); font-size: 13px; font-weight: 500; }
-    .result .val { font-size: 22px; font-weight: 700; margin-top: 6px; }
-    .result.primary { background: var(--primary); border-color: var(--primary); }
-    .result.primary .lbl { color: rgba(255,255,255,.8); }
-    .result.primary .val { color: #fff; }
-
     /* ---------- Toast ---------- */
     .toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 3000; }
     .toast { background: #fff; border: 1px solid var(--n200); border-left: 4px solid var(--green);
@@ -368,10 +350,6 @@
           <button class="tab" data-tab="upload">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             Import Receipts
-          </button>
-          <button class="tab" data-tab="calculator">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="9" y2="11"/><line x1="12" y1="11" x2="13" y2="11"/><line x1="8" y1="15" x2="9" y2="15"/><line x1="12" y1="15" x2="13" y2="15"/><line x1="16" y1="11" x2="16" y2="18"/></svg>
-            Consumption Calculator
           </button>
           <button class="tab" data-tab="prices">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>
@@ -536,60 +514,6 @@
             </div>
             <div style="margin-top:14px;">
               <button class="link" id="btnDownloadSample">Download a filled sample instead</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- =================== CALCULATOR TAB =================== -->
-        <section class="panel" id="panel-calculator">
-          <div class="card">
-            <div class="card-head">
-              <div class="ico">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="9" y2="11"/><line x1="12" y1="11" x2="13" y2="11"/><line x1="8" y1="15" x2="9" y2="15"/><line x1="16" y1="11" x2="16" y2="18"/></svg>
-              </div>
-              <div><h3>Consumption &amp; Cost Calculator</h3><p>A fuel receipt gives you <strong>total litres</strong>; the platform supplies the <strong>distance driven</strong>. Consumption is litres ÷ distance, and cost uses your <a href="#" id="goPrices">Fuel Prices</a>. Add a row per vehicle or fleet.</p></div>
-            </div>
-
-            <div class="table-wrap calc-table" style="margin-top:20px;">
-              <table>
-                <thead>
-                  <tr>
-                    <th style="width:22%">Fleet / Vehicle</th>
-                    <th style="width:12%">Fuel Type</th>
-                    <th style="width:15%">Total Liters</th>
-                    <th style="width:15%">Distance (km)</th>
-                    <th style="width:12%">Price / L (AED)</th>
-                    <th class="num-cell" style="width:12%">Consumption</th>
-                    <th class="num-cell" style="width:12%">Cost (AED)</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody id="calcBody"></tbody>
-                <tfoot>
-                  <tr>
-                    <td colspan="2">Total — <span id="calcRowCount">0</span> vehicles / fleets</td>
-                    <td class="num-cell" id="calcTotalLiters">0.00</td>
-                    <td class="num-cell" id="calcTotalDist">0</td>
-                    <td></td>
-                    <td class="num-cell" id="calcAvgCons">—</td>
-                    <td class="num-cell" id="calcTotalCost">AED 0.00</td>
-                    <td></td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-
-            <div style="margin-top:16px;">
-              <button class="btn btn-ghost btn-sm" id="btnAddCalcRow">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Add vehicle / fleet
-              </button>
-            </div>
-
-            <div class="result-grid">
-              <div class="result"><div class="lbl">Total Fuel Used</div><div class="val" id="resFuel">0.00 L</div></div>
-              <div class="result"><div class="lbl">Avg Consumption (L/100km)</div><div class="val" id="resCons">—</div></div>
-              <div class="result primary"><div class="lbl">Estimated Total Cost</div><div class="val" id="resCost">AED 0.00</div></div>
             </div>
           </div>
         </section>
@@ -835,7 +759,6 @@
     $('#tabs').addEventListener('click', e => {
       const t = e.target.closest('.tab'); if (t) activateTab(t.dataset.tab);
     });
-    $('#goPrices').addEventListener('click', e => { e.preventDefault(); activateTab('prices'); });
 
     /* ---------------- Fleet selects ---------------- */
     function fillFleetSelects() {
@@ -1139,54 +1062,6 @@
     $('#esTemplate').addEventListener('click', downloadTemplate);
     $('#esSample').addEventListener('click', loadSample);
 
-    /* ---------------- Consumption calculator ---------------- */
-    const calcBody = $('#calcBody');
-    function calcRow(fleet, fuel, liters, dist) {
-      const tr = document.createElement('tr');
-      tr.className = 'calc-row';
-      tr.innerHTML =
-        '<td><select class="c-fleet"><option value="">— select —</option>'+FLEETS.map(f=>'<option'+(f===fleet?' selected':'')+'>'+esc(f)+'</option>').join('')+'</select></td>'+
-        '<td><select class="c-fuel"><option'+(fuel==='Petrol'?' selected':'')+'>Petrol</option><option'+(fuel==='Diesel'?' selected':'')+'>Diesel</option></select></td>'+
-        '<td><input class="c-liters" type="number" min="0" step="0.1" value="'+(liters||'')+'" placeholder="0"></td>'+
-        '<td><input class="c-dist" type="number" min="0" step="1" value="'+(dist||'')+'" placeholder="0"></td>'+
-        '<td><input class="c-price" type="number" min="0" step="0.01" value="'+(PRICES[fuel]||PRICES.Diesel)+'"></td>'+
-        '<td class="num-cell calc-out c-cons">—</td>'+
-        '<td class="num-cell calc-out c-cost">'+CCY+' 0.00</td>'+
-        '<td><button class="icon-btn c-del" title="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>';
-      calcBody.appendChild(tr);
-      const fuelSel = $('.c-fuel', tr), priceIn = $('.c-price', tr);
-      fuelSel.addEventListener('change', () => { priceIn.value = PRICES[fuelSel.value] || PRICES.Diesel; recalc(); });
-      $$('input,select', tr).forEach(inp => inp.addEventListener('input', recalc));
-      $('.c-del', tr).addEventListener('click', () => {
-        if (calcBody.children.length > 1) { tr.remove(); recalc(); }
-        else toast('At least one row', 'Keep one row in the calculator.', 'error');
-      });
-      return tr;
-    }
-    function recalc() {
-      let totL = 0, totC = 0, totD = 0;
-      $$('.calc-row', calcBody).forEach(tr => {
-        const liters = parseFloat($('.c-liters', tr).value) || 0;
-        const dist = parseFloat($('.c-dist', tr).value) || 0;
-        const price = parseFloat($('.c-price', tr).value) || 0;
-        const cons = consumption(liters, dist);
-        const cost = liters * price;
-        $('.c-cons', tr).innerHTML = consTxt(cons);
-        $('.c-cost', tr).textContent = fmtMoney(cost);
-        totL += liters; totC += cost; totD += dist;
-      });
-      const avg = consumption(totL, totD);
-      $('#calcRowCount').textContent = calcBody.children.length;
-      $('#calcTotalLiters').textContent = fmtNum(totL,2);
-      $('#calcTotalDist').textContent = fmtNum(totD,0);
-      $('#calcAvgCons').innerHTML = consTxt(avg);
-      $('#calcTotalCost').textContent = fmtMoney(totC);
-      $('#resFuel').textContent = fmtNum(totL,2) + ' L';
-      $('#resCons').textContent = avg == null ? '—' : fmtNum(avg,1) + ' L/100km';
-      $('#resCost').textContent = fmtMoney(totC);
-    }
-    $('#btnAddCalcRow').addEventListener('click', () => { calcRow('','Diesel','',''); recalc(); });
-
     /* ---------------- Prices ---------------- */
     function stamp() {
       const d = new Date();
@@ -1196,8 +1071,7 @@
       const p = parseFloat($('#pricePetrol').value), d = parseFloat($('#priceDiesel').value);
       if (!(p > 0) || !(d > 0)) { toast('Invalid price', 'Enter valid petrol and diesel prices.', 'error'); return; }
       PRICES.Petrol = +p.toFixed(2); PRICES.Diesel = +d.toFixed(2);
-      $$('.calc-row', calcBody).forEach(tr => { $('.c-price', tr).value = PRICES[$('.c-fuel', tr).value] || PRICES.Diesel; });
-      recalc(); stamp();
+      stamp();
       toast('Fuel prices saved', 'Petrol '+fmtMoney(PRICES.Petrol)+' · Diesel '+fmtMoney(PRICES.Diesel)+' per liter.');
     });
 
@@ -1208,9 +1082,6 @@
     $('#uploadArt').innerHTML = ART_UPLOAD;
     setHistView('receipts');
     renderHistory();          // shows empty state (HISTORY is empty)
-    calcRow('North Region Fleet','Diesel', 1456, 8200);
-    calcRow('South Region Fleet','Petrol', 612, 5100);
-    recalc();
     stamp();
   })();
   </script>
